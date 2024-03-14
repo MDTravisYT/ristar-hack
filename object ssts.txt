@@ -1,0 +1,6 @@
+0 - id (word)
+8 - mappings (longword)
+$E - VRAM? (word)
+$16 - routine? (byte)
+$17 - subroutine? (byte)
+$42 - ASCII text (first 2 bytes are how many indexes there are, the rest are longword)

@@ -1,0 +1,88 @@
+00000000                            align    macro
+00000000                                cnop 0,\1
+00000000                                endm
+00000000                            
+00000000                            		incbin     "ristar.j - Copy.bin"	;	Include hex edited Ristar ROM
+00200000                            											;		to jump to custom code
+00200000                            		align		$200000                 ;	Aligns to proper location
+00200000                            											
+00200000                            CustomGameMode:                             ;	
+00200000 4EB9 0000 0000             		jsr	SHC                             ;	Play SHC screen
+00200006 33FC 0000 00FF EA00        		move.w	#0,	$FFEA00                 ;	Move 0 to game mode RAM (i moved the level mode here)
+0020000E 4EF9 0000 789E             		jmp	$789E                           ;	Jump to level code
+00200014                            											
+00200014                            SHC:	incbin	"SHC_Advanced.bin"          ;	SHC screen include
+00205AFE                            
+00205AFE                            		align		$210000        
+00210000                            
+00210000 =00163716                  ChunkPointers	=	$163716
+00210000 =00004C3E                  stardecompress	=	$4C3E
+00210000 =000049A8                  nemdec			=	$49A8
+00210000                            
+00210000                            sub_87EA:                               ; CODE XREF: sub_7B32+492↑p
+00210000 1039 00FF E500                             move.b  $FFE500,d0
+00210006 4EB9 0001 3A68                             jsr     $13A68
+0021000C 1039 00FF E500                             move.b  $FFE500,d0
+00210012 4EB9 0001 3B06                             jsr     $13B06
+00210018 1039 00FF E500                             move.b  $FFE500,d0
+0021001E 4EB9 0001 3D0E                             jsr     $13D0E
+00210024 43F9 0016 3716                             lea     (ChunkPointers).l,a1
+0021002A 7000                                       moveq   #0,d0
+0021002C 1039 00FF E500                             move.b  $FFE500,d0
+00210032 D040                                       add.w   d0,d0
+00210034 D040                                       add.w   d0,d0
+00210036 2071 0000                                  movea.l (a1,d0.w),a0
+0021003A 49F9 00FF 0000                             lea     $FF0000.l,a4
+00210040 4EB9 0000 49A8                             jsr     (nemdec).l
+00210046 43F9 0018 8492                             lea     ($188492).l,a1
+0021004C 7000                                       moveq   #0,d0
+0021004E 1039 00FF E500                             move.b  $FFE500,d0
+00210054 D040                                       add.w   d0,d0
+00210056 D040                                       add.w   d0,d0
+00210058 2271 0000                                  movea.l (a1,d0.w),a1
+0021005C 45F9 00FF A400                             lea     $FFA400,a2
+00210062 4EB9 0001 3DB6                             jsr     $13DB6
+00210068 4EB9 0001 3A0E                             jsr     $13A0E
+0021006E 4EF9 0001 3A2E                             jmp     $13A2E
+00210074                            ; End of function sub_87EA
+00210074                            
+00210074                            
+00210074                            ; =============== S U B R O U T I N E =======================================
+00210074                            
+00210074                            
+00210074                            sub_8852:                               ; CODE XREF: sub_7B32+104↑p
+00210074 1039 00FF E500                             move.b  $FFE500,d0
+0021007A 4EB9 0001 3A98                             jsr     $13A98
+00210080 1039 00FF E500                             move.b  $FFE500,d0
+00210086 4EB9 0001 3CC4                             jsr     $13CC4
+0021008C 1039 00FF E500                             move.b  $FFE500,d0
+00210092                            
+00210092 43F9 0018 53B0                             lea     ($1853B0).l,a1
+00210098                            loc_886A:                               ; CODE XREF: sub_EEA6+CC↓p
+00210098 7000                                       moveq   #0,d0
+0021009A 1039 00FF E500                             move.b  $FFE500,d0
+002100A0 D040                                       add.w   d0,d0
+002100A2 D040                                       add.w   d0,d0
+002100A4 2071 0000                                  movea.l (a1,d0.w),a0
+002100A8 43F9 00FF 4000                             lea     ($FF4000).l,a1
+002100AE 4EB9 0000 4C3E                             jsr     (stardecompress).l
+002100B4 41F9 00FF 4000                             lea     ($FF4000).l,a0
+002100BA 43F9 00FF AA00                             lea     ($FFAA00).l,a1
+002100C0 3E3C 00FF                                  move.w  #$FF,d7
+002100C4                            
+002100C4                            loc_889A:                               ; CODE XREF: sub_8852+4A↓j
+002100C4 22D8                                       move.l  (a0)+,(a1)+
+002100C6 51CF FFFC                                  dbf     d7,loc_889A
+002100CA 43F9 0018 8552                             lea     ($188552).l,a1
+002100D0 7000                                       moveq   #0,d0
+002100D2 1039 00FF E500                             move.b  $FFE500,d0
+002100D8 D040                                       add.w   d0,d0
+002100DA D040                                       add.w   d0,d0
+002100DC 2271 0000                                  movea.l (a1,d0.w),a1
+002100E0 45F9 00FF A600                             lea     $FFA600,a2
+002100E6 4EB9 0001 3DB6                             jsr     $13DB6
+002100EC 4E75                                       rts
+002100EE                            				
+002100EE                            		align		$220000  
+00220000                            		
+00220000                            		incbin	"chunks.nem"
