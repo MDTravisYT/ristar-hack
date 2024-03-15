@@ -28,13 +28,9 @@ nemdec			=	$49A8
 nemdec_vram		=	$4996
 
 sub_87EA:				               ; CODE XREF: sub_7B32+492↑p
-				move.b  $FFE500,d0		;	level display?
-				jsr     sub_13A68
+
 		;		move.b  $FFE500,d0		;	level art
 		;		jsr     $13B06
-				lea		ArtMZ,	a0
-				move.l  #$40000000,($C00004).l
-				jsr     (nemdec_vram).l
 				
 				move.b  $FFE500,d0		;	level palette
 				jsr     $13D0E
@@ -55,6 +51,11 @@ sub_87EA:				               ; CODE XREF: sub_7B32+492↑p
 				lea     $FFA400,a2
 				jsr     $13DB6
 				jsr     $13A0E
+				lea		ArtMZ,	a0
+				move.l  #$64000000,($C00004).l
+				jsr     (nemdec_vram).l
+				move.b  $FFE500,d0		;	level display?
+				jsr     sub_13A68
 				jmp     $13A2E
 ; End of function sub_87EA
 
@@ -110,10 +111,10 @@ sub_13A68:				              ; CODE XREF: sub_87EA+4↑p
 				add.w   d0,d0
 				move.w  4(a0,d0.w),d7
 				movea.l (a0,d0.w),a0
-		;		lea     $FF8008,a4
-		;		tst.b   $FFE501
-		;		bne.s   loc_13A90
 				lea     $FF8008,a4
+				tst.b   $FFE501
+				bne.s   loc_13A90
+				lea     $FF8000,a4
 
 loc_13A90:				              ; CODE XREF: sub_13A68+22↑j
 				move.w  #$120,d0
