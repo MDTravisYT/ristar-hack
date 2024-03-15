@@ -25,12 +25,17 @@ SHC:	incbin	"SHC_Advanced.bin"          ;	SHC screen include
 ChunkPointers	=	$163716
 stardec	=	$4C3E
 nemdec			=	$49A8
+nemdec_vram		=	$4996
 
 sub_87EA:				               ; CODE XREF: sub_7B32+492↑p
 				move.b  $FFE500,d0		;	level display?
 				jsr     sub_13A68
-				move.b  $FFE500,d0		;	level art
-				jsr     $13B06
+		;		move.b  $FFE500,d0		;	level art
+		;		jsr     $13B06
+				lea		ArtMZ,	a0
+				move.l  #$40000000,($C00004).l
+				jsr     (nemdec_vram).l
+				
 				move.b  $FFE500,d0		;	level palette
 				jsr     $13D0E
 				lea     (ChunkPointers).l,a1
@@ -105,10 +110,10 @@ sub_13A68:				              ; CODE XREF: sub_87EA+4↑p
 				add.w   d0,d0
 				move.w  4(a0,d0.w),d7
 				movea.l (a0,d0.w),a0
+		;		lea     $FF8008,a4
+		;		tst.b   $FFE501
+		;		bne.s   loc_13A90
 				lea     $FF8008,a4
-				tst.b   $FFE501
-				bne.s   loc_13A90
-				lea     $FF8000,a4
 
 loc_13A90:				              ; CODE XREF: sub_13A68+22↑j
 				move.w  #$120,d0
@@ -137,3 +142,4 @@ loc_13FAA:				              ; CODE XREF: sub_13A68+548↓j
 ;	============================================================================!  
 
 		incbin	"SonLVL/blocks.nem"
+ArtMZ:	incbin	"SonLVL/ArtMZ.bin"
