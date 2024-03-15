@@ -20,30 +20,30 @@ stardecompress	=	$4C3E
 nemdec			=	$49A8
 
 sub_87EA:                               ; CODE XREF: sub_7B32+492↑p
-                move.b  $FFE500,d0
-                jsr     $13A68
-                move.b  $FFE500,d0
-                jsr     $13B06
-                move.b  $FFE500,d0
-                jsr     $13D0E
-                lea     (ChunkPointers).l,a1
-                moveq   #0,d0
-                move.b  $FFE500,d0
-                add.w   d0,d0
-                add.w   d0,d0
-                movea.l (a1,d0.w),a0
-                lea     $FF0000.l,a4
-                jsr     (nemdec).l
-                lea     ($188492).l,a1
-                moveq   #0,d0
-                move.b  $FFE500,d0
-                add.w   d0,d0
-                add.w   d0,d0
-                movea.l (a1,d0.w),a1
-                lea     $FFA400,a2
-                jsr     $13DB6
-                jsr     $13A0E
-                jmp     $13A2E
+				move.b  $FFE500,d0		;	level display?
+				jsr     $13A68
+				move.b  $FFE500,d0		;	level art
+				jsr     $13B06
+				move.b  $FFE500,d0		;	level palette
+				jsr     $13D0E
+				lea     (ChunkPointers).l,a1
+				moveq   #0,d0
+				move.b  $FFE500,d0
+				add.w   d0,d0
+				add.w   d0,d0
+				movea.l (a1,d0.w),a0
+				lea     $FF0000.l,a4
+				jsr     (nemdec).l
+				lea     ($188492).l,a1
+				moveq   #0,d0
+				move.b  $FFE500,d0
+				add.w   d0,d0
+				add.w   d0,d0
+				movea.l (a1,d0.w),a1
+				lea     $FFA400,a2
+				jsr     $13DB6
+				jsr     $13A0E
+				jmp     $13A2E
 ; End of function sub_87EA
 
 
@@ -85,4 +85,4 @@ loc_889A:                               ; CODE XREF: sub_8852+4A↓j
 				
 		align		$220000  
 		
-		incbin	"chunks.nem"
+		incbin	"SonLVL/chunks.nem"

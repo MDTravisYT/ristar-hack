@@ -1,0 +1,32 @@
+Operating system: Microsoft Windows NT 6.2.9200.0
+Opening INI file "C:\Users\MineC\Downloads\ristar_hack\SonLVL\SonLVL.ini"...
+Game type is S1.
+Loading Flora...
+Loading 8x8 tiles from file "dump.vram", using compression Uncompressed...
+Loading 16x16 blocks from file "blocks.eni", using compression Enigma...
+Loading 256x256 chunks from file "chunks.nem", using compression Nemesis...
+FG layout file "../levels/ghz1.bin" not found.
+BG layout file "../levels/ghzbg.bin" not found.
+Loading palette file "pal.bin"...
+Source: 0 Destination: 0 Length: 64
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at SonicRetro.SonLVL.API.LevelData.LoadLevelColArr() in C:\Users\MineC\Downloads\SonLVL-R\SonLVLAPI\LevelData.cs:line 775
+   at SonicRetro.SonLVL.API.LevelData.LoadLevel(String levelname, Boolean loadGraphics) in C:\Users\MineC\Downloads\SonLVL-R\SonLVLAPI\LevelData.cs:line 200
+   at SonicRetro.SonLVL.GUI.MainForm.backgroundLevelLoader_DoWork(Object sender, DoWorkEventArgs e) in C:\Users\MineC\Downloads\SonLVL-R\SonLVL\MainForm.cs:line 575
+   at SonicRetro.SonLVL.GUI.MainForm.LevelToolStripMenuItem_Clicked(Object sender, EventArgs e) in C:\Users\MineC\Downloads\SonLVL-R\SonLVL\MainForm.cs:line 560
+   at System.Windows.Forms.ToolStripItem.RaiseEvent(Object key, EventArgs e)
+   at System.Windows.Forms.ToolStripMenuItem.OnClick(EventArgs e)
+   at System.Windows.Forms.ToolStripItem.HandleClick(EventArgs e)
+   at System.Windows.Forms.ToolStripItem.HandleMouseUp(MouseEventArgs e)
+   at System.Windows.Forms.ToolStripItem.FireEventInteractive(EventArgs e, ToolStripItemEventType met)
+   at System.Windows.Forms.ToolStripItem.FireEvent(EventArgs e, ToolStripItemEventType met)
+   at System.Windows.Forms.ToolStrip.OnMouseUp(MouseEventArgs mea)
+   at System.Windows.Forms.ToolStripDropDown.OnMouseUp(MouseEventArgs mea)
+   at System.Windows.Forms.Control.WmMouseUp(Message& m, MouseButtons button, Int32 clicks)
+   at System.Windows.Forms.Control.WndProc(Message& m)
+   at System.Windows.Forms.ScrollableControl.WndProc(Message& m)
+   at System.Windows.Forms.ToolStrip.WndProc(Message& m)
+   at System.Windows.Forms.ToolStripDropDown.WndProc(Message& m)
+   at System.Windows.Forms.Control.ControlNativeWindow.OnMessage(Message& m)
+   at System.Windows.Forms.Control.ControlNativeWindow.WndProc(Message& m)
+   at System.Windows.Forms.NativeWindow.Callback(IntPtr hWnd, Int32 msg, IntPtr wparam, IntPtr lparam)

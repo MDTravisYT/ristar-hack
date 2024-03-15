@@ -20,30 +20,30 @@
 00210000 =000049A8                  nemdec			=	$49A8
 00210000                            
 00210000                            sub_87EA:                               ; CODE XREF: sub_7B32+492↑p
-00210000 1039 00FF E500                             move.b  $FFE500,d0
-00210006 4EB9 0001 3A68                             jsr     $13A68
-0021000C 1039 00FF E500                             move.b  $FFE500,d0
-00210012 4EB9 0001 3B06                             jsr     $13B06
-00210018 1039 00FF E500                             move.b  $FFE500,d0
-0021001E 4EB9 0001 3D0E                             jsr     $13D0E
-00210024 43F9 0016 3716                             lea     (ChunkPointers).l,a1
-0021002A 7000                                       moveq   #0,d0
-0021002C 1039 00FF E500                             move.b  $FFE500,d0
-00210032 D040                                       add.w   d0,d0
-00210034 D040                                       add.w   d0,d0
-00210036 2071 0000                                  movea.l (a1,d0.w),a0
-0021003A 49F9 00FF 0000                             lea     $FF0000.l,a4
-00210040 4EB9 0000 49A8                             jsr     (nemdec).l
-00210046 43F9 0018 8492                             lea     ($188492).l,a1
-0021004C 7000                                       moveq   #0,d0
-0021004E 1039 00FF E500                             move.b  $FFE500,d0
-00210054 D040                                       add.w   d0,d0
-00210056 D040                                       add.w   d0,d0
-00210058 2271 0000                                  movea.l (a1,d0.w),a1
-0021005C 45F9 00FF A400                             lea     $FFA400,a2
-00210062 4EB9 0001 3DB6                             jsr     $13DB6
-00210068 4EB9 0001 3A0E                             jsr     $13A0E
-0021006E 4EF9 0001 3A2E                             jmp     $13A2E
+00210000 1039 00FF E500             				move.b  $FFE500,d0		;	level display?
+00210006 4EB9 0001 3A68             				jsr     $13A68
+0021000C 1039 00FF E500             				move.b  $FFE500,d0		;	level art
+00210012 4EB9 0001 3B06             				jsr     $13B06
+00210018 1039 00FF E500             				move.b  $FFE500,d0		;	level palette
+0021001E 4EB9 0001 3D0E             				jsr     $13D0E
+00210024 43F9 0016 3716             				lea     (ChunkPointers).l,a1
+0021002A 7000                       				moveq   #0,d0
+0021002C 1039 00FF E500             				move.b  $FFE500,d0
+00210032 D040                       				add.w   d0,d0
+00210034 D040                       				add.w   d0,d0
+00210036 2071 0000                  				movea.l (a1,d0.w),a0
+0021003A 49F9 00FF 0000             				lea     $FF0000.l,a4
+00210040 4EB9 0000 49A8             				jsr     (nemdec).l
+00210046 43F9 0018 8492             				lea     ($188492).l,a1
+0021004C 7000                       				moveq   #0,d0
+0021004E 1039 00FF E500             				move.b  $FFE500,d0
+00210054 D040                       				add.w   d0,d0
+00210056 D040                       				add.w   d0,d0
+00210058 2271 0000                  				movea.l (a1,d0.w),a1
+0021005C 45F9 00FF A400             				lea     $FFA400,a2
+00210062 4EB9 0001 3DB6             				jsr     $13DB6
+00210068 4EB9 0001 3A0E             				jsr     $13A0E
+0021006E 4EF9 0001 3A2E             				jmp     $13A2E
 00210074                            ; End of function sub_87EA
 00210074                            
 00210074                            
@@ -85,4 +85,4 @@
 002100EE                            				
 002100EE                            		align		$220000  
 00220000                            		
-00220000                            		incbin	"chunks.nem"
+00220000                            		incbin	"SonLVL/chunks.nem"
