@@ -6,7 +6,10 @@ align    macro
 
 		incbin     "ristar.j - Copy.bin"	;	Include hex edited Ristar ROM
 											;		to jump to custom code
-		align		$200000				 ;	Aligns to proper location
+											
+;	============================================================================!
+		align		$200000				 ;	SHC SPLASH							!
+;	============================================================================!
 											
 CustomGameMode:				             ;	
 		jsr	SHC				             ;	Play SHC screen
@@ -15,10 +18,12 @@ CustomGameMode:				             ;
 											
 SHC:	incbin	"SHC_Advanced.bin"          ;	SHC screen include
 
-		align		$210000        
+;	============================================================================!
+		align		$210000				 ;	CHUNK LOADING						!
+;	============================================================================!        
 
 ChunkPointers	=	$163716
-stardecompress	=	$4C3E
+stardec	=	$4C3E
 nemdec			=	$49A8
 
 sub_87EA:				               ; CODE XREF: sub_7B32+492↑p
@@ -67,7 +72,7 @@ loc_886A:				               ; CODE XREF: sub_EEA6+CC↓p
 				add.w   d0,d0
 				movea.l (a1,d0.w),a0
 				lea     ($FF4000).l,a1
-				jsr     (stardecompress).l
+				jsr     (stardec).l
 				lea     ($FF4000).l,a0
 				lea     ($FFAA00).l,a1
 				move.w  #$FF,d7
@@ -85,7 +90,9 @@ loc_889A:				               ; CODE XREF: sub_8852+4A↓j
 				jsr     $13DB6
 				rts
 				
-		align		$212000  
+;	============================================================================!
+		align		$212000				 ;	BLOCK LOADING						!
+;	============================================================================!
 		
 BlockPointers	=	$11C764
 
@@ -98,10 +105,10 @@ sub_13A68:				              ; CODE XREF: sub_87EA+4↑p
 				add.w   d0,d0
 				move.w  4(a0,d0.w),d7
 				movea.l (a0,d0.w),a0
-				lea     $FF8008,a1
+				lea     $FF8008,a4
 				tst.b   $FFE501
 				bne.s   loc_13A90
-				lea     $FF8000,a1
+				lea     $FF8000,a4
 
 loc_13A90:				              ; CODE XREF: sub_13A68+22↑j
 				move.w  #$120,d0
@@ -109,16 +116,24 @@ loc_13A90:				              ; CODE XREF: sub_13A68+22↑j
 loc_13F9C:				              ; CODE XREF: sub_13A68+2C↑j
 								        ; sub_13A98+3E↑j
 				movem.l d0/d7-a1,-(sp)
-				jsr     (stardecompress).l
+				jsr     (nemdec).l
 				movem.l (sp)+,d0/d7-a1
 
 loc_13FAA:				              ; CODE XREF: sub_13A68+548↓j
-				move.w  (a1),d1
+				move.w  (a4),d1
 				add.w   d0,d1
-				move.w  d1,(a1)+
+				move.w  d1,(a4)+
 				dbf     d7,loc_13FAA
 				rts
 				
-		align		$220000  
+;	============================================================================!
+		align		$220000				 ;	CHUNK DATA							!
+;	============================================================================!  
 		
 		incbin	"SonLVL/chunks.nem"
+		
+;	============================================================================!
+		align		$228000				 ;	BLOCK DATA							!
+;	============================================================================!  
+
+		incbin	"SonLVL/blocks.nem"
