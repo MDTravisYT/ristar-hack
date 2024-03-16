@@ -299,8 +299,12 @@ LoadScreen:
 				move.w	#$8400+(PLANE_B/$2000),(A6)
 		;		move.w	#$9000+%11111111,	(A6)
 				
-				move.l	#CRAMWRITE+%00000000,	(A6)
-				move.w	#$0EEE,	VDPDATA
+				move.l	#CRAMWRITE,	(A6)
+				move.w	#$0000,	VDPDATA
+				move.w	#$00EE,	VDPDATA
+				move.w	#$00CE,	VDPDATA
+				move.w	#$008C,	VDPDATA
+				move.w	#$0004,	VDPDATA
 				
 				lea		Font,	a0		;	load graphics
 				move.l  #$40000000,($C00004).l
