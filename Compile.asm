@@ -247,20 +247,88 @@ sub_1F310:                              ; CODE XREF: sub_1F26C↑p
 
 bra_1f362:		jmp	$1f362
 				 
-unk_1F0FA:      dc.l $FF00E020          ; DATA XREF: sub_1F214+34↓o
-                                         ; sub_1F310+34↓o ...
-                 dc.l $A060F0F0
-                 dc.l $10109090
-                 dc.l $7070D030
-                 dc.l $D030B050
-                 dc.l $B050F8F8
-                 dc.l $F8F80808
-                 dc.l $8088888
-                 dc.l $88887878
-                 dc.l $7878C838
-                 dc.l $C838C838
-                 dc.l $C838B848
-                 dc.l $B848B848
-                 dc.l $B84840C0
-                 dc.l $8040C000
-                 dc.l 0
+unk_1F0FA:      
+				dc.l $FF00E020
+				dc.l $A060F0F0
+				dc.l $10109090
+				dc.l $7070D030
+				dc.l $D030B050
+				dc.l $B050F8F8
+				dc.l $F8F80808
+				dc.l $8088888
+				dc.l $88887878
+				dc.l $7878C838
+				dc.l $C838C838
+				dc.l $C838B848
+				dc.l $B848B848
+				dc.l $B84840C0
+				dc.l $8040C000
+				dc.l 0
+				
+;	============================================================================!
+		align		$300000				 ;	LOADING SCREEN						!
+;	============================================================================! 
+
+PLANE_A		=	$C000
+PLANE_B		=	$E000
+VDPDATA		=	$C00000
+VDPCTRL		=	$C00004
+CRAMWRITE:	=	$C0000000
+
+copyTilemap:	macro source,loc,width,height
+		lea	(source).l,a1
+		move.l	#$40000000+((loc&$3FFF)<<16)+((loc&$C000)>>14),d0
+		moveq	#width,d1
+		moveq	#height,d2
+		bsr.w	DrawTileMap
+		endm
+
+LoadScreen:
+				move.b  (a5)+,$11(a3)
+				dbf     d5,LoadScreen
+				move.w  d0,(a2)
+				movem.l (a6),d0-d7/a0-a6
+				move    #$2700,sr
+				
+		;		above is a chunk of the init routine, as it's jumped to in the middle of it
+				
+				lea		VDPCTRL,	A6
+		;		move.w	#$8000+%00000001,(A6)
+				move.w	#$8100+%01010100,(A6)
+				move.w	#$8200+(PLANE_A/$400),(A6)
+				move.w	#$8400+(PLANE_B/$2000),(A6)
+		;		move.w	#$9000+%11111111,	(A6)
+				
+				move.l	#CRAMWRITE+%00000000,	(A6)
+				move.w	#$0EEE,	VDPDATA
+				
+				lea		Font,	a0		;	load graphics
+				move.l  #$40000000,($C00004).l
+				jsr     (nemdec_vram).l
+				
+				lea	  (LoadMap).l,a0	;	map
+				lea     $FF0000.l,a4
+				jsr     (nemdec).l
+				
+				copyTilemap	$FF0000,$C620,9,3
+				
+				jmp		$300	;	jump to checksum check
+				
+DrawTileMap:		;	SUBROUTINE
+                lea     VDPDATA,a6
+                move.l  #$800000,d4
+
+.LoopRow:                           
+                move.l  d0,4(a6)    ; VDPCTRL
+                move.w  d1,d3
+
+.LoopColumn: 
+                move.w  (a1)+,(a6)
+                dbf     d3,.LoopColumn
+                add.l   d4,d0
+                dbf     d2,.LoopRow
+                rts
+
+				
+Font:		incbin	"Font.nem"
+LoadMap:	incbin	"LoadMap.nem"
