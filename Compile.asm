@@ -12,6 +12,9 @@ align    macro
 ;	============================================================================!
 											
 CustomGameMode:				             ;	
+
+		move.b	#$25,	$FFE00A
+		
 		jsr	SHC				             ;	Play SHC screen
 		move.w	#0,	$FFEA00				 ;	Move 0 to game mode RAM (i moved the level mode here)
 		jmp	$789E				           ;	Jump to level code
@@ -155,115 +158,6 @@ Indexes:incbin	"SonLVL/index.nem"
 		align		$230000				 ;	LAYOUT DATA							!
 ;	============================================================================!  
 		incbin	"SonLVL/map.bin"
-		
-;	============================================================================!
-		align		$240000				 ;	COLLISION DATA						!
-;	============================================================================!  
-NormalArray:		incbin	"SonLVL/Collision Array (Normal).bin"
-RotatedArray:		incbin	"SonLVL/Collision Array (Rotated).bin"
-;	============================================================================!
-		align		$242000				 ;	COLLISION CODE						!
-;	============================================================================!  
-
-sub_1F49C:                              ; CODE XREF: sub_1854C+36↑p
-                                         ; sub_18598+13C↑p ...
-                 lea     $FFE552,a3
-                 movea.l $FFF010,a1
-                 jsr     sub_13D48
-                 moveq   #1,d3
-                 move.w  (a1),d0
-                 move.w  a1,($FFAE90).l
-                 move.w  d0,($FFAEF6).l
-                 btst    d7,d0
-                 beq.w   bra_1F52C
-                 andi.w  #$1FF,d0
-                 beq.w   bra_1F52C
-                 move.w  d0,d5
-                 add.w   d5,d5
-                 lea     $FFB200,a1
-                 move.w  (a1,d5.w),2(a3)
-                 movea.l $FFE528,a1
-                 move.b  (a1,d0.w),d0
-                 andi.w  #$FF,d0
-                 move.w  d0,d4
-                 beq.w   bra_1F52C
-                 lea     (unk_1F0FA).l,a1
-                 move.b  (a1,d4.w),(a3)
-                 lsl.w   #4,d4
-                 move.w  d1,d5
-                 andi.w  #$F,d5
-                 add.w   d4,d5
-                 lea     NormalArray(pc),a1
-                 move.b  (a1,d5.w),d4
-                 ext.w   d4
-                 beq.w   bra_1f530
-                 bmi.s   bra_1F51E
-                 move.w  d2,d5
-                 andi.w  #$F,d5
-                 add.w   d5,d4
-                 cmpi.w  #$F,d4
-                 blt.s   bra_1f530
-                 moveq   #$FFFFFFFF,d3
-          ;       bra.s   bra_1f530
-				
-bra_1f530:		jmp	$1f530
-sub_13D48:
-				jmp	$13D48
-bra_1F52C:
-				jmp	$1F52C
-bra_1F51E:		jmp	$1F51E
-
-;	============================================================================!
-		align		$244000				 ;	COLLISION CODE						!
-;	============================================================================! 
-
-sub_1F310:                              ; CODE XREF: sub_1F26C↑p
-                                         ; sub_1F26C+3C↑p ...
-                 movea.l $FFF010,a1
-                 jsr     $13D48
-                 move.w  (a1),d0
-                 btst    d7,d0
-                 beq.s   bra_1f362
-                 andi.w  #$1FF,d0
-                 beq.s   bra_1f362
-                 move.w  d0,d3
-                 add.w   d3,d3
-                 lea     $FFB200,a1
-                 move.w  (a1,d3.w),2(a3)
-                 movea.l $FFE528,a1
-                 move.b  (a1,d0.w),d0
-                 move.b  d0,1(a3)
-                 andi.w  #$FF,d0
-                 lea     unk_1F0FA(pc),a1
-                 move.b  (a1,d0.w),(a3)
-                 lsl.w   #4,d0
-                 move.w  d2,d3
-                 andi.w  #$F,d3
-                 add.w   d0,d3
-                 lea     RotatedArray(pc),a1
-                 move.b  (a1,d3.w),d0
-                 ext.w   d0
-                 rts
-
-bra_1f362:		jmp	$1f362
-				 
-unk_1F0FA:      
-				dc.l $FF00E020
-				dc.l $A060F0F0
-				dc.l $10109090
-				dc.l $7070D030
-				dc.l $D030B050
-				dc.l $B050F8F8
-				dc.l $F8F80808
-				dc.l $8088888
-				dc.l $88887878
-				dc.l $7878C838
-				dc.l $C838C838
-				dc.l $C838B848
-				dc.l $B848B848
-				dc.l $B84840C0
-				dc.l $8040C000
-				dc.l 0
 				
 ;	============================================================================!
 		align		$300000				 ;	LOADING SCREEN						!
