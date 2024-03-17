@@ -149,7 +149,7 @@ loc_13FAA:				              ; CODE XREF: sub_13A68+548↓j
 
 		incbin	"SonLVL/blocks.nem"
 ArtMZ:	incbin	"SonLVL/ArtMZ.bin"
-Indexes:incbin	"SonLVL/Indexes.bin"
+Indexes:incbin	"SonLVL/index.nem"
 
 ;	============================================================================!
 		align		$230000				 ;	LAYOUT DATA							!
