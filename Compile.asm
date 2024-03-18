@@ -29,28 +29,31 @@ CustomGameMode:				             ;
 ;		move.w	#$8100+%01010100,(A6)
 ;		move.w	#$8200+(PLANE_A/$400),(A6)
 ;		move.w	#$8400+(PLANE_B/$2000),(A6)
-		move.l	#$000000EE,	$FFEF00
-		move.l	#$00CE008C,	$FFEF04
-		move.w	#$0004,	$FFEF08
+		lea		MDTPal,		a0
+		lea		$FFEF00,	a1
+		rept	32
+			move.l	(a0)+,(a1)+
+		endr
+
 		
 		move	#$2700,	sr
-		lea		Font,	a0		;	load graphics
-		move.l  #$40000000,($C00004).l
+		lea		MDTArt,	a0		;	load graphics
+		move.l  #$40000001,($C00004).l
 		jsr     (nemdec_vram).l
 		
-		lea	  (LoadMap).l,a0	;	map
+		lea	  (MDTMap).l,a0	;	map
 		lea     $FF0000.l,a4
 		jsr     (nemdec).l
 		move	#$2300,	sr
 		
-		copyTilemap	$FF0000,$C620,9,3
+		copyTilemap	$FF0000,$C206,$21,$15
 		
 		moveq	#60-1,	d4
 		
 		move.b	#$25,	$FFE00A
 		
 	.vint:
-		bsr.s	VSync
+		jsr		VSync
 	;	jsr		$C8018
 		dbf		d4,	.vint
 		jsr		Pal_FadeBlack
@@ -59,6 +62,8 @@ CustomGameMode:				             ;
 		jmp	$789E				           ;	Jump to level code
 											
 ;SHC:	incbin	"SHC_Advanced.bin"          ;	SHC screen include
+
+MDTPal:	incbin	"Splash Final.bin"
 
 ;****************************************************************************
 ; VSync
@@ -147,6 +152,12 @@ deblue:
 next:
 		addq.w	#2,a0
 		rts						; return
+
+		even
+
+MDTMap:	incbin	"MDT Splash Map.nem"
+		even
+MDTArt:	incbin	"MDT Splash.nem"
 
 ;	============================================================================!
 		align		$210000				 ;	CHUNK LOADING						!

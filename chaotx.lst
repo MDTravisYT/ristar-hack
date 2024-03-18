@@ -29,127 +29,138 @@
 00200006                            ;		move.w	#$8100+%01010100,(A6)
 00200006                            ;		move.w	#$8200+(PLANE_A/$400),(A6)
 00200006                            ;		move.w	#$8400+(PLANE_B/$2000),(A6)
-00200006 23FC 0000 00EE 00FF EF00   		move.l	#$000000EE,	$FFEF00
-00200010 23FC 00CE 008C 00FF EF04   		move.l	#$00CE008C,	$FFEF04
-0020001A 33FC 0004 00FF EF08        		move.w	#$0004,	$FFEF08
-00200022                            		
-00200022 46FC 2700                  		move	#$2700,	sr
-00200026 41F9 0000 0000             		lea		Font,	a0		;	load graphics
-0020002C 23FC 4000 0000 00C0 0004   		move.l  #$40000000,($C00004).l
-00200036 4EB9 0000 0000             		jsr     (nemdec_vram).l
-0020003C                            		
-0020003C 41F9 0000 0000             		lea	  (LoadMap).l,a0	;	map
-00200042 49F9 00FF 0000             		lea     $FF0000.l,a4
-00200048 4EB9 0000 0000             		jsr     (nemdec).l
-0020004E 46FC 2300                  		move	#$2300,	sr
+00200006 41F9 0000 0000             		lea		MDTPal,		a0
+0020000C 43F9 00FF EF00             		lea		$FFEF00,	a1
+00200012                            		rept	32
+00200012                            			move.l	(a0)+,(a1)+
+00200012 22D8 22D8 22D8 22D8 22D8+  		endr
+00200052                            
 00200052                            		
-00200052 43F9 00FF 0000 203C 4620+  		copyTilemap	$FF0000,$C620,9,3
-00200068                            		
-00200068 783B                       		moveq	#60-1,	d4
-0020006A                            		
-0020006A 13FC 0025 00FF E00A        		move.b	#$25,	$FFE00A
-00200072                            		
-00200072                            	.vint:
-00200072 6100                       		bsr.s	VSync
-00200074                            	;	jsr		$C8018
-00200074 51CC FFFC                  		dbf		d4,	.vint
-00200078 4EB9 0000 0000             		jsr		Pal_FadeBlack
-0020007E                            
-0020007E 33FC 0000 00FF EA00        		move.w	#0,	$FFEA00				 ;	Move 0 to game mode RAM (i moved the level mode here)
-00200086 4EF9 0000 789E             		jmp	$789E				           ;	Jump to level code
-0020008C                            											
-0020008C                            ;SHC:	incbin	"SHC_Advanced.bin"          ;	SHC screen include
-0020008C                            
-0020008C                            ;****************************************************************************
-0020008C                            ; VSync
-0020008C                            ; Waits until the next frame
-0020008C                            ;****************************************************************************
-0020008C                            
-0020008C                            VSync:
-0020008C 4DF9 00C0 0004                 lea     ($C00004),a6
-00200092                            
-00200092                            @Loop1:                             ; Wait until current VBlank is over
-00200092 3E16                           move.w    (a6),d7
-00200094 0807 0003                      btst.l    #3,d7
-00200098 66F8                           bne.s    @Loop1
-0020009A                            
-0020009A                            @Loop2:                             ; Wait until next VBlank starts
-0020009A 3E16                           move.w    (a6),d7
-0020009C 0807 0003                      btst.l    #3,d7
-002000A0 67F8                           beq.s    @Loop2
-002000A2                            
-002000A2 4E75                           rts                             ; End of subroutine
-002000A4                            
-002000A4                            ; ---------------------------------------------------------------------------
-002000A4                            ; Subroutine to fade a palette to black at the speed of d0
-002000A4                            ; ---------------------------------------------------------------------------
-002000A4                            
-002000A4                            Pal_FadeBlack:						; Offset: 000006CC
-002000A4 4279 FFFF EF00             		clr.w	$FFFFEF00
-002000AA 7815                       		moveq	#$15,d4
-002000AC                            
-002000AC                            PFB_FadeFrame:
-002000AC 61DE                       		bsr.s	VSync
-002000AE                            
-002000AE 6100                       		bsr.s	PFB_FadeBuffer
-002000B0 51CC FFFA                  		dbf	d4,	PFB_FadeFrame
-002000B4                            
-002000B4                            PFB_NotFinished:					; Offset: 000006FC
-002000B4 4E75                       		rts						; return
-002000B6                            
-002000B6                            ; ---------------------------------------------------------------------------
-002000B6                            ; Subroutine to fade a buffer's colours to black once
-002000B6                            ; ---------------------------------------------------------------------------
-002000B6                            
-002000B6                            PFB_FadeBuffer:							; Offset: 000006FE
-002000B6 41F8 EF00                  		lea	($FFFFEF00).w,a0			; load palette buffer address
-002000BA 303C 0040                  		move.w	#$0040,d0				; set repeat times
-002000BE                            	;	adda.w	d0,a0
-002000BE                            	;	subq.w	#$01,d0					; subtract 1 (most likely for the dbf instruction)
-002000BE                            
-002000BE                            PFB_NextColour:						; Offset: 00000708
-002000BE                            	;	move.w	d2,d0					; copy colour to d0
-002000BE 6100                       		bsr.s	PFB_DecreaseColour			; process red
-002000C0 51C8 FFFC                  		dbf	d0,PFB_NextColour			; repeat til all colours processed
-002000C4 4E75                       		rts						; return
-002000C6                            
-002000C6                            ; ---------------------------------------------------------------------------
-002000C6                            ; Subroutine to decrease a single colour nybble
-002000C6                            ; ---------------------------------------------------------------------------
-002000C6                            
-002000C6                            PFB_DecreaseColour:					; Offset: 0000072C
-002000C6                            dered:
-002000C6 3410                       		move.w	(a0),d2
-002000C8 6700                       		beq.s	next
-002000CA 3202                       		move.w	d2,d1
-002000CC 0241 000E                  		andi.w	#$E,d1
-002000D0 6700                       		beq.s	degreen
-002000D2 5558                       		subq.w	#2,(a0)+	; decrease red value
-002000D4 4E75                       		rts	
-002000D6                            ; ===========================================================================
-002000D6                            
-002000D6                            degreen:
-002000D6 3202                       		move.w	d2,d1
-002000D8 0241 00E0                  		andi.w	#$E0,d1
-002000DC 6700                       		beq.s	deblue
-002000DE 0458 0020                  		subi.w	#$20,(a0)+	; decrease green value
-002000E2 4E75                       		rts	
-002000E4                            ; ===========================================================================
-002000E4                            
-002000E4                            deblue:
-002000E4 3202                       		move.w	d2,d1
-002000E6 0241 0E00                  		andi.w	#$E00,d1
-002000EA 6700                       		beq.s	next
-002000EC 0458 0200                  		subi.w	#$200,(a0)+	; decrease blue	value
-002000F0 4E75                       		rts	
-002000F2                            ; ===========================================================================
-002000F2                            
-002000F2                            next:
-002000F2 5448                       		addq.w	#2,a0
-002000F4 4E75                       		rts						; return
-002000F6                            
-002000F6                            ;	============================================================================!
-002000F6                            		align		$210000				 ;	CHUNK LOADING						!
+00200052 46FC 2700                  		move	#$2700,	sr
+00200056 41F9 0000 0000             		lea		MDTArt,	a0		;	load graphics
+0020005C 23FC 4000 0001 00C0 0004   		move.l  #$40000001,($C00004).l
+00200066 4EB9 0000 0000             		jsr     (nemdec_vram).l
+0020006C                            		
+0020006C 41F9 0000 0000             		lea	  (MDTMap).l,a0	;	map
+00200072 49F9 00FF 0000             		lea     $FF0000.l,a4
+00200078 4EB9 0000 0000             		jsr     (nemdec).l
+0020007E 46FC 2300                  		move	#$2300,	sr
+00200082                            		
+00200082 43F9 00FF 0000 203C 4206+  		copyTilemap	$FF0000,$C206,$21,$15
+00200098                            		
+00200098 783B                       		moveq	#60-1,	d4
+0020009A                            		
+0020009A 13FC 0025 00FF E00A        		move.b	#$25,	$FFE00A
+002000A2                            		
+002000A2                            	.vint:
+002000A2 4EB9 0000 0000             		jsr		VSync
+002000A8                            	;	jsr		$C8018
+002000A8 51CC FFF8                  		dbf		d4,	.vint
+002000AC 4EB9 0000 0000             		jsr		Pal_FadeBlack
+002000B2                            
+002000B2 33FC 0000 00FF EA00        		move.w	#0,	$FFEA00				 ;	Move 0 to game mode RAM (i moved the level mode here)
+002000BA 4EF9 0000 789E             		jmp	$789E				           ;	Jump to level code
+002000C0                            											
+002000C0                            ;SHC:	incbin	"SHC_Advanced.bin"          ;	SHC screen include
+002000C0                            
+002000C0                            MDTPal:	incbin	"Splash Final.bin"
+00200140                            
+00200140                            ;****************************************************************************
+00200140                            ; VSync
+00200140                            ; Waits until the next frame
+00200140                            ;****************************************************************************
+00200140                            
+00200140                            VSync:
+00200140 4DF9 00C0 0004                 lea     ($C00004),a6
+00200146                            
+00200146                            @Loop1:                             ; Wait until current VBlank is over
+00200146 3E16                           move.w    (a6),d7
+00200148 0807 0003                      btst.l    #3,d7
+0020014C 66F8                           bne.s    @Loop1
+0020014E                            
+0020014E                            @Loop2:                             ; Wait until next VBlank starts
+0020014E 3E16                           move.w    (a6),d7
+00200150 0807 0003                      btst.l    #3,d7
+00200154 67F8                           beq.s    @Loop2
+00200156                            
+00200156 4E75                           rts                             ; End of subroutine
+00200158                            
+00200158                            ; ---------------------------------------------------------------------------
+00200158                            ; Subroutine to fade a palette to black at the speed of d0
+00200158                            ; ---------------------------------------------------------------------------
+00200158                            
+00200158                            Pal_FadeBlack:						; Offset: 000006CC
+00200158 4279 FFFF EF00             		clr.w	$FFFFEF00
+0020015E 7815                       		moveq	#$15,d4
+00200160                            
+00200160                            PFB_FadeFrame:
+00200160 61DE                       		bsr.s	VSync
+00200162                            
+00200162 6100                       		bsr.s	PFB_FadeBuffer
+00200164 51CC FFFA                  		dbf	d4,	PFB_FadeFrame
+00200168                            
+00200168                            PFB_NotFinished:					; Offset: 000006FC
+00200168 4E75                       		rts						; return
+0020016A                            
+0020016A                            ; ---------------------------------------------------------------------------
+0020016A                            ; Subroutine to fade a buffer's colours to black once
+0020016A                            ; ---------------------------------------------------------------------------
+0020016A                            
+0020016A                            PFB_FadeBuffer:							; Offset: 000006FE
+0020016A 41F8 EF00                  		lea	($FFFFEF00).w,a0			; load palette buffer address
+0020016E 303C 0040                  		move.w	#$0040,d0				; set repeat times
+00200172                            	;	adda.w	d0,a0
+00200172                            	;	subq.w	#$01,d0					; subtract 1 (most likely for the dbf instruction)
+00200172                            
+00200172                            PFB_NextColour:						; Offset: 00000708
+00200172                            	;	move.w	d2,d0					; copy colour to d0
+00200172 6100                       		bsr.s	PFB_DecreaseColour			; process red
+00200174 51C8 FFFC                  		dbf	d0,PFB_NextColour			; repeat til all colours processed
+00200178 4E75                       		rts						; return
+0020017A                            
+0020017A                            ; ---------------------------------------------------------------------------
+0020017A                            ; Subroutine to decrease a single colour nybble
+0020017A                            ; ---------------------------------------------------------------------------
+0020017A                            
+0020017A                            PFB_DecreaseColour:					; Offset: 0000072C
+0020017A                            dered:
+0020017A 3410                       		move.w	(a0),d2
+0020017C 6700                       		beq.s	next
+0020017E 3202                       		move.w	d2,d1
+00200180 0241 000E                  		andi.w	#$E,d1
+00200184 6700                       		beq.s	degreen
+00200186 5558                       		subq.w	#2,(a0)+	; decrease red value
+00200188 4E75                       		rts	
+0020018A                            ; ===========================================================================
+0020018A                            
+0020018A                            degreen:
+0020018A 3202                       		move.w	d2,d1
+0020018C 0241 00E0                  		andi.w	#$E0,d1
+00200190 6700                       		beq.s	deblue
+00200192 0458 0020                  		subi.w	#$20,(a0)+	; decrease green value
+00200196 4E75                       		rts	
+00200198                            ; ===========================================================================
+00200198                            
+00200198                            deblue:
+00200198 3202                       		move.w	d2,d1
+0020019A 0241 0E00                  		andi.w	#$E00,d1
+0020019E 6700                       		beq.s	next
+002001A0 0458 0200                  		subi.w	#$200,(a0)+	; decrease blue	value
+002001A4 4E75                       		rts	
+002001A6                            ; ===========================================================================
+002001A6                            
+002001A6                            next:
+002001A6 5448                       		addq.w	#2,a0
+002001A8 4E75                       		rts						; return
+002001AA                            
+002001AA                            		even
+002001AA                            
+002001AA                            MDTMap:	incbin	"MDT Splash Map.nem"
+00200276 00                         		even
+00200276                            MDTArt:	incbin	"MDT Splash.nem"
+002004DB                            
+002004DB                            ;	============================================================================!
+002004DB                            		align		$210000				 ;	CHUNK LOADING						!
 00210000                            ;	============================================================================!        
 00210000                            
 00210000 =00163716                  ChunkPointers	=	$163716
