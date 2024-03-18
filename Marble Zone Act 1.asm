@@ -52,24 +52,32 @@ Mus83_MZ_FM4:
 	dc.b	nB6, $06
 
 Mus83_MZ_Jump03:
-	smpsCall            Mus83_MZ_Call03
-	dc.b	nA6, $09, nRst, $03, nA6, nRst, nB6, $06, nRst, nA6, $0C, nRst
-	dc.b	$06, nA6, $09, nRst, $03, nA6, nRst, nB6, $06, nRst, nA6, $0C
-	dc.b	nRst, $18, nG6, $03, nRst, $0F, nG6, $03, nRst, $39, nB6, $06
-	smpsCall            Mus83_MZ_Call03
-	dc.b	nF6, $09, nRst, $03, nF6, nRst, nA6, $06, nRst, nF6, $0C, nRst
-	dc.b	$06, nAb6, $09, nRst, $03, nAb6, nRst, nB6, $06, nRst, nAb6, $0C
-	dc.b	nRst, $18, nC7, $03, nRst, $0F, nC7, $03, nRst, $09, nE7, $09
-	dc.b	nRst, $03, nE7, nRst, nD7, $06, nRst, nC7, $03, nRst, nB6, $12
-	smpsCall            Mus83_MZ_Call02
-	smpsJump            Mus83_MZ_Jump03
-
-Mus83_MZ_Call03:
 	dc.b	smpsNoAttack, $03, nRst, nB6, nRst, nC7, $06, nRst, nB6, $0C, nRst, $06
 	dc.b	nB6, $09, nRst, $03, nB6, nRst, nC7, $06, nRst, nB6, $0C, nRst
 	dc.b	$18, nC7, $03, nRst, $0F, nC7, $03, nRst, $1B, nC7, $03, nRst
 	dc.b	$0F, nC7, $03, nRst, $09
-	smpsReturn
+	dc.b	nA6, $09, nRst, $03, nA6, nRst, nB6, $06, nRst, nA6, $0C, nRst
+	dc.b	$06, nA6, $09, nRst, $03, nA6, nRst, nB6, $06, nRst, nA6, $0C
+	dc.b	nRst, $18, nG6, $03, nRst, $0F, nG6, $03, nRst, $39, nB6, $06
+	dc.b	smpsNoAttack, $03, nRst, nB6, nRst, nC7, $06, nRst, nB6, $0C, nRst, $06
+	dc.b	nB6, $09, nRst, $03, nB6, nRst, nC7, $06, nRst, nB6, $0C, nRst
+	dc.b	$18, nC7, $03, nRst, $0F, nC7, $03, nRst, $1B, nC7, $03, nRst
+	dc.b	$0F, nC7, $03, nRst, $09
+	dc.b	nF6, $09, nRst, $03, nF6, nRst, nA6, $06, nRst, nF6, $0C, nRst
+	dc.b	$06, nAb6, $09, nRst, $03, nAb6, nRst, nB6, $06, nRst, nAb6, $0C
+	dc.b	nRst, $18, nC7, $03, nRst, $0F, nC7, $03, nRst, $09, nE7, $09
+	dc.b	nRst, $03, nE7, nRst, nD7, $06, nRst, nC7, $03, nRst, nB6, $12
+	dc.b	nRst, $06
+
+	dc.b	nE7, $03, nRst, nC7, nRst, nA6, nRst, $09
+	dc.b	nD7, $03, nRst, nB6, nRst, nG6, nRst, $09
+	dc.b	nC7, $03, nRst, nA6, nRst, nF6, nRst, $09
+	dc.b	nD7, $03, nRst, nB6, nRst, nG6, nRst, $09
+	dc.b	nE7, $03, nRst, nC7, nRst, nA6, nRst, $09
+	dc.b	nD7, $03, nRst, nB6, nRst, nG6, nRst, $09
+	dc.b	nC7, $03, nRst, nA6, nRst, nF6, nRst, $09
+	dc.b	nD7, $03, nRst, nB6, nRst, nG6, nRst, $09
+	smpsJump            Mus83_MZ_Jump03
 
 ; FM5 Data
 Mus83_MZ_FM5:
@@ -83,26 +91,35 @@ Mus83_MZ_FM5:
 	dc.b	nG6, $06
 
 Mus83_MZ_Jump02:
-	smpsCall            Mus83_MZ_Call01
+	dc.b	smpsNoAttack, $03, nRst, nG6, nRst, nA6, $06, nRst, nG6, $0C, nRst, $06
+	dc.b	nG6, $09, nRst, $03, nG6, nRst, nA6, $06, nRst, nG6, $0C, nRst
+	dc.b	$18, nA6, $03, nRst, $0F, nA6, $03, nRst, $1B, nA6, $03, nRst
+	dc.b	$0F, nA6, $03, nRst, $09
 	dc.b	nF6, $09, nRst, $03, nF6, nRst, nG6, $06, nRst, nF6, $0C, nRst
 	dc.b	$06, nF6, $09, nRst, $03, nF6, nRst, nG6, $06, nRst, nF6, $0C
 	dc.b	nRst, $18, nE6, $03, nRst, $0F, nE6, $03, nRst, $39, nG6, $06
-	smpsCall            Mus83_MZ_Call01
+	dc.b	smpsNoAttack, $03, nRst, nG6, nRst, nA6, $06, nRst, nG6, $0C, nRst, $06
+	dc.b	nG6, $09, nRst, $03, nG6, nRst, nA6, $06, nRst, nG6, $0C, nRst
+	dc.b	$18, nA6, $03, nRst, $0F, nA6, $03, nRst, $1B, nA6, $03, nRst
+	dc.b	$0F, nA6, $03, nRst, $09
 	dc.b	nD6, $09, nRst, $03, nD6, nRst, nF6, $06, nRst, nD6, $0C, nRst
 	dc.b	$06, nE6, $09, nRst, $03, nE6, nRst, nAb6, $06, nRst, nE6, $0C
 	dc.b	nRst, $18, nA6, $03, nRst, $0F, nA6, $03, nRst, $09, nC7, $09
 	dc.b	nRst, $03, nC7, nRst, nB6, $06, nRst, nA6, $03, nRst, nAb6, $12
 	smpsAlterNote       $03
-	smpsCall            Mus83_MZ_Call02
+	dc.b	nRst, $06
+
+	dc.b	nE7, $03, nRst, nC7, nRst, nA6, nRst, $09
+	dc.b	nD7, $03, nRst, nB6, nRst, nG6, nRst, $09
+	dc.b	nC7, $03, nRst, nA6, nRst, nF6, nRst, $09
+	dc.b	nD7, $03, nRst, nB6, nRst, nG6, nRst, $09
+	dc.b	nE7, $03, nRst, nC7, nRst, nA6, nRst, $09
+	dc.b	nD7, $03, nRst, nB6, nRst, nG6, nRst, $09
+	dc.b	nC7, $03, nRst, nA6, nRst, nF6, nRst, $09
+	dc.b	nD7, $03, nRst, nB6, nRst, nG6, nRst, $09
 	smpsAlterNote       $00
 	smpsJump            Mus83_MZ_Jump02
 
-Mus83_MZ_Call01:
-	dc.b	smpsNoAttack, $03, nRst, nG6, nRst, nA6, $06, nRst, nG6, $0C, nRst, $06
-	dc.b	nG6, $09, nRst, $03, nG6, nRst, nA6, $06, nRst, nG6, $0C, nRst
-	dc.b	$18, nA6, $03, nRst, $0F, nA6, $03, nRst, $1B, nA6, $03, nRst
-	dc.b	$0F, nA6, $03, nRst, $09
-	smpsReturn
 
 ; FM2 Data
 Mus83_MZ_FM2:
@@ -112,17 +129,30 @@ Mus83_MZ_FM2:
 	dc.b	nE4, $06, nRst, nE3, $24
 
 Mus83_MZ_Jump01:
-	smpsCall            Mus83_MZ_Call00
-
-Mus83_MZ_Loop00:
+	dc.b	nA3, $03, nRst, nA3, $06, nE4, $03, nRst, nE4, $06, nD4, $03
+	dc.b	nRst, nD4, $06, nE4, $03, nRst, nE4, $06
+	dc.b	nA3, $03, nRst, nA3, $06, nE4, $03, nRst, nE4, $06, nD4, $03
+	dc.b	nRst, nD4, $06, nE4, $03, nRst, nE4, $06
+	dc.b	nD4, $03, nRst, nD4, $06, nA4, $03, nRst, nA4, $06, nF4, $03
+	dc.b	nRst, nF4, $06, nA4, $03, nRst, nA4, $06
+	dc.b	nD4, $03, nRst, nD4, $06, nA4, $03, nRst, nA4, $06, nF4, $03
+	dc.b	nRst, nF4, $06, nA4, $03, nRst, nA4, $06
 	dc.b	nG3, $03, nRst, nG3, $06, nD4, $03, nRst, nD4, $06, nB3, $03
 	dc.b	nRst, nB3, $06, nD4, $03, nRst, nD4, $06
-	smpsLoop            $01, $02, Mus83_MZ_Loop00
+	dc.b	nG3, $03, nRst, nG3, $06, nD4, $03, nRst, nD4, $06, nB3, $03
+	dc.b	nRst, nB3, $06, nD4, $03, nRst, nD4, $06
 	dc.b	nC4, $03, nRst, nC4, $06, nG4, $03, nRst, nG4, $06, nE4, $03
 	dc.b	nRst, nE4, $06, nG4, $03, nRst, nG4, $06, nB3, $03, nRst, nB3
 	dc.b	$06, nF4, $03, nRst, nF4, $06, nE4, $03, nRst, nE4, $06, nB3
 	dc.b	$03, nRst, nB3, $06
-	smpsCall            Mus83_MZ_Call00
+	dc.b	nA3, $03, nRst, nA3, $06, nE4, $03, nRst, nE4, $06, nD4, $03
+	dc.b	nRst, nD4, $06, nE4, $03, nRst, nE4, $06
+	dc.b	nA3, $03, nRst, nA3, $06, nE4, $03, nRst, nE4, $06, nD4, $03
+	dc.b	nRst, nD4, $06, nE4, $03, nRst, nE4, $06
+	dc.b	nD4, $03, nRst, nD4, $06, nA4, $03, nRst, nA4, $06, nF4, $03
+	dc.b	nRst, nF4, $06, nA4, $03, nRst, nA4, $06
+	dc.b	nD4, $03, nRst, nD4, $06, nA4, $03, nRst, nA4, $06, nF4, $03
+	dc.b	nRst, nF4, $06, nA4, $03, nRst, nA4, $06
 	dc.b	nB3, $03, nRst, nB3, $06, nF4, $03, nRst, nF4, $06, nD4, $03
 	dc.b	nRst, nD4, $06, nF4, $03, nRst, nF4, $06, nE4, $03, nRst, nE4
 	dc.b	$06, nB4, $03, nRst, nB4, $06, nAb4, $03, nRst, nAb4, $06, nB4
@@ -130,24 +160,19 @@ Mus83_MZ_Loop00:
 	dc.b	nE4, $06, nC4, $03, nRst, nC4, $06, nE4, $03, nRst, nE4, $06
 	dc.b	nA3, $03, nRst, nA3, $06, nE4, $03, nRst, nE4, $06, nD4, $03
 	dc.b	nRst, nD4, $06, nE4, $03, nRst, nE4, $06
-
-Mus83_MZ_Loop01:
 	dc.b	nA3, $12, nA3, $06, nG3, $12, nG3, $06, nF3, $12, nF3, $06
 	dc.b	nG3, $12, nG3, $06
-	smpsLoop            $01, $02, Mus83_MZ_Loop01
+	dc.b	nA3, $12, nA3, $06, nG3, $12, nG3, $06, nF3, $12, nF3, $06
+	dc.b	nG3, $12, nG3, $06
 	smpsNop             $01
 	smpsJump            Mus83_MZ_Jump01
 
-Mus83_MZ_Call00:
-	dc.b	nA3, $03, nRst, nA3, $06, nE4, $03, nRst, nE4, $06, nD4, $03
-	dc.b	nRst, nD4, $06, nE4, $03, nRst, nE4, $06
-	smpsLoop            $00, $02, Mus83_MZ_Call00
 
-Mus83_MZ_Loop05:
-	dc.b	nD4, $03, nRst, nD4, $06, nA4, $03, nRst, nA4, $06, nF4, $03
-	dc.b	nRst, nF4, $06, nA4, $03, nRst, nA4, $06
-	smpsLoop            $00, $02, Mus83_MZ_Loop05
-	smpsReturn
+
+; PSG2 Data
+Mus83_MZ_PSG2:
+	dc.b	nRst, $02
+	smpsAlterNote       $01
 
 ; PSG1 Data
 Mus83_MZ_PSG1:
@@ -155,28 +180,19 @@ Mus83_MZ_PSG1:
 
 Mus83_MZ_Jump06:
 	dc.b	nRst, $60
-	smpsCall            Mus83_MZ_Call06
-	dc.b	nRst, $2A, nF7, $0C, nF7, $06, nD7, $0C, nB6, $06, nAb6, $2A
-	dc.b	nRst, $48
-	smpsCall            Mus83_MZ_Call06
-	dc.b	nRst, $60
-
-Mus83_MZ_Loop03:
-	dc.b	nA6, $06, nC7, $03, nA6, nC7, $06, nA6, nB6, nG6, nD6, nB6
-	dc.b	nF6, nA6, $03, nF6, nA6, $06, nF6, nG6, nA6, nB6, nG6
-	smpsLoop            $00, $02, Mus83_MZ_Loop03
-	smpsJump            Mus83_MZ_Jump06
-
-Mus83_MZ_Call06:
 	dc.b	nRst, $30, nF7, $03, nD7, nA6, nF6, nD7, nA6, nF6, nD6, nA6
 	dc.b	nF6, nD6, nA5, nF6, nD6, nA5, nF5, $27, nRst, $3C
-	smpsReturn
+	dc.b	nRst, $2A, nF7, $0C, nF7, $06, nD7, $0C, nB6, $06, nAb6, $2A
+	dc.b	nRst, $48
+	dc.b	nRst, $30, nF7, $03, nD7, nA6, nF6, nD7, nA6, nF6, nD6, nA6
+	dc.b	nF6, nD6, nA5, nF6, nD6, nA5, nF5, $27, nRst, $3C
+	dc.b	nRst, $60
+	dc.b	nA6, $06, nC7, $03, nA6, nC7, $06, nA6, nB6, nG6, nD6, nB6
+	dc.b	nF6, nA6, $03, nF6, nA6, $06, nF6, nG6, nA6, nB6, nG6
+	dc.b	nA6, nC7, $03, nA6, nC7, $06, nA6, nB6, nG6, nD6, nB6
+	dc.b	nF6, nA6, $03, nF6, nA6, $06, nF6, nG6, nA6, nB6, nG6
+	smpsJump            Mus83_MZ_Jump06
 
-; PSG2 Data
-Mus83_MZ_PSG2:
-	dc.b	nRst, $02
-	smpsAlterNote       $01
-	smpsJump            Mus83_MZ_PSG1
 
 ; PSG3 Data
 Mus83_MZ_PSG3:
@@ -218,14 +234,8 @@ Mus83_MZ_Jump00:
 	smpsJump            Mus83_MZ_Jump00
 
 Mus83_MZ_Call02:
-	dc.b	nRst, $05
 
-Mus83_MZ_Loop04:
-	dc.b	nRst, $01, nE7, $03, nRst, nC7, nRst, nA6, nRst, $09
-	dc.b	nD7, $03, nRst, nB6, nRst, nG6, nRst, $09
-	dc.b	nC7, $03, nRst, nA6, nRst, nF6, nRst, $09
-	dc.b	nD7, $03, nRst, nB6, nRst, nG6, nRst, $08
-	smpsLoop            $00, $02, Mus83_MZ_Loop04
+
 	smpsReturn
 
 Mus83_MZ_Voices:

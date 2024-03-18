@@ -22,47 +22,66 @@
 00200000                            											
 00200000                            CustomGameMode:				             ;	
 00200000                            		
-00200000 4EB9 0000 0000             		jsr	SHC				             ;	Play SHC screen
-00200006                            	
-00200006                            ;		lea		VDPCTRL,	A6
-00200006                            ;	;	move.w	#$8000+%00000001,(A6)
-00200006                            ;		move.w	#$8100+%01010100,(A6)
-00200006                            ;		move.w	#$8200+(PLANE_A/$400),(A6)
-00200006                            ;		move.w	#$8400+(PLANE_B/$2000),(A6)
-00200006                            ;		move.l	#CRAMWRITE,	VDPCTRL
-00200006                            ;		move.w	#$0000,	VDPDATA
-00200006                            ;		move.w	#$00EE,	VDPDATA
-00200006                            ;		move.w	#$00CE,	VDPDATA
-00200006                            ;		move.w	#$008C,	VDPDATA
-00200006                            ;		move.w	#$0004,	VDPDATA
-00200006                            ;		
-00200006                            ;		lea		Font,	a0		;	load graphics
-00200006                            ;		move.l  #$40000000,($C00004).l
-00200006                            ;		jsr     (nemdec_vram).l
-00200006                            ;		
-00200006                            ;		lea	  (LoadMap).l,a0	;	map
-00200006                            ;		lea     $FF0000.l,a4
-00200006                            ;		jsr     (nemdec).l
-00200006                            ;		
-00200006                            ;		copyTilemap	$FF0000,$C620,9,3
-00200006                            ;		
-00200006                            ;		move.b	#$01,	$FFE00A
-00200006                            ;		
-00200006                            ;		moveq	#60-1,	d7
-00200006                            ;		
-00200006                            ;	.loop:
-00200006                            ;		subi.b	#1,	d7
-00200006                            ;		jsr		$51CE
-00200006                            ;		jsr		$C8018
-00200006                            ;		dbf		d7,	.loop
-00200006                            
-00200006 33FC 0000 00FF EA00        		move.w	#0,	$FFEA00				 ;	Move 0 to game mode RAM (i moved the level mode here)
-0020000E 4EF9 0000 789E             		jmp	$789E				           ;	Jump to level code
-00200014                            											
-00200014                            SHC:	incbin	"SHC_Advanced.bin"          ;	SHC screen include
-00205AFE                            
-00205AFE                            ;	============================================================================!
-00205AFE                            		align		$210000				 ;	CHUNK LOADING						!
+00200000                            ;		jsr	SHC				             ;	Play SHC screen
+00200000                            	
+00200000 4DF9 0000 0000             		lea		VDPCTRL,	A6
+00200006                            	;	move.w	#$8000+%00000001,(A6)
+00200006 3CBC 8154                  		move.w	#$8100+%01010100,(A6)
+0020000A 3CBC 0000                  		move.w	#$8200+(PLANE_A/$400),(A6)
+0020000E 3CBC 0000                  		move.w	#$8400+(PLANE_B/$2000),(A6)
+00200012 23FC 0000 0000 0000 0000   		move.l	#CRAMWRITE,	VDPCTRL
+0020001C 33FC 0000 0000 0000        		move.w	#$0000,	VDPDATA
+00200024 33FC 00EE 0000 0000        		move.w	#$00EE,	VDPDATA
+0020002C 33FC 00CE 0000 0000        		move.w	#$00CE,	VDPDATA
+00200034 33FC 008C 0000 0000        		move.w	#$008C,	VDPDATA
+0020003C 33FC 0004 0000 0000        		move.w	#$0004,	VDPDATA
+00200044                            		
+00200044 41F9 0000 0000             		lea		Font,	a0		;	load graphics
+0020004A 23FC 4000 0000 00C0 0004   		move.l  #$40000000,($C00004).l
+00200054 4EB9 0000 0000             		jsr     (nemdec_vram).l
+0020005A                            		
+0020005A 41F9 0000 0000             		lea	  (LoadMap).l,a0	;	map
+00200060 49F9 00FF 0000             		lea     $FF0000.l,a4
+00200066 4EB9 0000 0000             		jsr     (nemdec).l
+0020006C                            		
+0020006C 43F9 00FF 0000 203C 4620+  		copyTilemap	$FF0000,$C620,9,3
+00200082                            		
+00200082 13FC 0001 00FF E00A        		move.b	#$01,	$FFE00A
+0020008A                            		
+0020008A 7E3B                       		moveq	#60-1,	d7
+0020008C                            	;	move	#$2700,sr
+0020008C                            		
+0020008C                            	.vint:
+0020008C                            	;	bsr.s	VSync
+0020008C 51CF FFFE                  		dbf		d7,	.vint
+00200090                            
+00200090 33FC 0000 00FF EA00        		move.w	#0,	$FFEA00				 ;	Move 0 to game mode RAM (i moved the level mode here)
+00200098 4EF9 0000 789E             		jmp	$789E				           ;	Jump to level code
+0020009E                            											
+0020009E                            ;SHC:	incbin	"SHC_Advanced.bin"          ;	SHC screen include
+0020009E                            
+0020009E                            ;****************************************************************************
+0020009E                            ; VSync
+0020009E                            ; Waits until the next frame
+0020009E                            ;****************************************************************************
+0020009E                            
+0020009E                            VSync:
+0020009E 4DF9 00C0 0004                 lea     ($C00004),a6
+002000A4                            
+002000A4                            @Loop1:                             ; Wait until current VBlank is over
+002000A4 3E16                           move.w    (a6),d7
+002000A6 0807 0003                      btst.l    #3,d7
+002000AA 66F8                           bne.s    @Loop1
+002000AC                            
+002000AC                            @Loop2:                             ; Wait until next VBlank starts
+002000AC 3E16                           move.w    (a6),d7
+002000AE 0807 0003                      btst.l    #3,d7
+002000B2 67F8                           beq.s    @Loop2
+002000B4                            
+002000B4 4E75                           rts                             ; End of subroutine
+002000B6                            
+002000B6                            ;	============================================================================!
+002000B6                            		align		$210000				 ;	CHUNK LOADING						!
 00210000                            ;	============================================================================!        
 00210000                            
 00210000 =00163716                  ChunkPointers	=	$163716
@@ -948,274 +967,284 @@
 002380CD D406                       	dc.b	nB6, $06
 002380CF                            
 002380CF                            Mus83_MZ_Jump03:
-002380CF F800 00                    	smpsCall            Mus83_MZ_Call03
-002380D2 D209 8003 D280 D406 80D2+  	dc.b	nA6, $09, nRst, $03, nA6, nRst, nB6, $06, nRst, nA6, $0C, nRst
-002380DE 06D2 0980 03D2 80D4 0680+  	dc.b	$06, nA6, $09, nRst, $03, nA6, nRst, nB6, $06, nRst, nA6, $0C
-002380EA 8018 D003 800F D003 8039+  	dc.b	nRst, $18, nG6, $03, nRst, $0F, nG6, $03, nRst, $39, nB6, $06
-002380F6 F800 00                    	smpsCall            Mus83_MZ_Call03
-002380F9 CE09 8003 CE80 D206 80CE+  	dc.b	nF6, $09, nRst, $03, nF6, nRst, nA6, $06, nRst, nF6, $0C, nRst
-00238105 06D1 0980 03D1 80D4 0680+  	dc.b	$06, nAb6, $09, nRst, $03, nAb6, nRst, nB6, $06, nRst, nAb6, $0C
-00238111 8018 D503 800F D503 8009+  	dc.b	nRst, $18, nC7, $03, nRst, $0F, nC7, $03, nRst, $09, nE7, $09
-0023811D 8003 D980 D706 80D5 0380+  	dc.b	nRst, $03, nE7, nRst, nD7, $06, nRst, nC7, $03, nRst, nB6, $12
-00238129 F800 00                    	smpsCall            Mus83_MZ_Call02
-0023812C F6FF A1                    	smpsJump            Mus83_MZ_Jump03
-0023812F                            
-0023812F                            Mus83_MZ_Call03:
-0023812F E703 80D4 80D5 0680 D40C+  	dc.b	smpsNoAttack, $03, nRst, nB6, nRst, nC7, $06, nRst, nB6, $0C, nRst, $06
-0023813B D409 8003 D480 D506 80D4+  	dc.b	nB6, $09, nRst, $03, nB6, nRst, nC7, $06, nRst, nB6, $0C, nRst
-00238147 18D5 0380 0FD5 0380 1BD5+  	dc.b	$18, nC7, $03, nRst, $0F, nC7, $03, nRst, $1B, nC7, $03, nRst
-00238153 0FD5 0380 09               	dc.b	$0F, nC7, $03, nRst, $09
-00238158 F9                         	smpsReturn
-00238159                            
-00238159                            ; FM5 Data
-00238159                            Mus83_MZ_FM5:
-0023815B E6FC                       	smpsAlterVol        $FC
-0023815D FB24                       	smpsAlterPitch      $24
-0023815F 8006 B503 0306 80A9 1E     	dc.b	nRst, $06, nE4, $03, $03, $06, nRst, nE3, $1E
-0023816A FBDC                       	smpsAlterPitch      $DC
-0023816C E604                       	smpsAlterVol        $04
-0023816E D006                       	dc.b	nG6, $06
-00238170                            
-00238170                            Mus83_MZ_Jump02:
-00238170 F800 00                    	smpsCall            Mus83_MZ_Call01
-00238173 CE09 8003 CE80 D006 80CE+  	dc.b	nF6, $09, nRst, $03, nF6, nRst, nG6, $06, nRst, nF6, $0C, nRst
-0023817F 06CE 0980 03CE 80D0 0680+  	dc.b	$06, nF6, $09, nRst, $03, nF6, nRst, nG6, $06, nRst, nF6, $0C
-0023818B 8018 CD03 800F CD03 8039+  	dc.b	nRst, $18, nE6, $03, nRst, $0F, nE6, $03, nRst, $39, nG6, $06
-00238197 F800 00                    	smpsCall            Mus83_MZ_Call01
-0023819A CB09 8003 CB80 CE06 80CB+  	dc.b	nD6, $09, nRst, $03, nD6, nRst, nF6, $06, nRst, nD6, $0C, nRst
-002381A6 06CD 0980 03CD 80D1 0680+  	dc.b	$06, nE6, $09, nRst, $03, nE6, nRst, nAb6, $06, nRst, nE6, $0C
-002381B2 8018 D203 800F D203 8009+  	dc.b	nRst, $18, nA6, $03, nRst, $0F, nA6, $03, nRst, $09, nC7, $09
-002381BE 8003 D580 D406 80D2 0380+  	dc.b	nRst, $03, nC7, nRst, nB6, $06, nRst, nA6, $03, nRst, nAb6, $12
-002381CA E103                       	smpsAlterNote       $03
-002381CC F800 00                    	smpsCall            Mus83_MZ_Call02
-002381CF E100                       	smpsAlterNote       $00
-002381D1 F6FF 9D                    	smpsJump            Mus83_MZ_Jump02
-002381D4                            
-002381D4                            Mus83_MZ_Call01:
-002381D4 E703 80D0 80D2 0680 D00C+  	dc.b	smpsNoAttack, $03, nRst, nG6, nRst, nA6, $06, nRst, nG6, $0C, nRst, $06
-002381E0 D009 8003 D080 D206 80D0+  	dc.b	nG6, $09, nRst, $03, nG6, nRst, nA6, $06, nRst, nG6, $0C, nRst
-002381EC 18D2 0380 0FD2 0380 1BD2+  	dc.b	$18, nA6, $03, nRst, $0F, nA6, $03, nRst, $1B, nA6, $03, nRst
-002381F8 0FD2 0380 09               	dc.b	$0F, nA6, $03, nRst, $09
-002381FD F9                         	smpsReturn
-002381FE                            
-002381FE                            ; FM2 Data
-002381FE                            Mus83_MZ_FM2:
-00238200 8006 B503 B5               	dc.b	nRst, $06, nE4, $03, nE4
-00238205 E201                       	smpsNop             $01
-00238207 B506 80A9 24               	dc.b	nE4, $06, nRst, nE3, $24
-0023820C                            
-0023820C                            Mus83_MZ_Jump01:
-0023820C F800 00                    	smpsCall            Mus83_MZ_Call00
-0023820F                            
-0023820F                            Mus83_MZ_Loop00:
-0023820F AC03 80AC 06B3 0380 B306+  	dc.b	nG3, $03, nRst, nG3, $06, nD4, $03, nRst, nD4, $06, nB3, $03
-0023821B 80B0 06B3 0380 B306        	dc.b	nRst, nB3, $06, nD4, $03, nRst, nD4, $06
-00238223 F701 02FF E8               	smpsLoop            $01, $02, Mus83_MZ_Loop00
-00238228 B103 80B1 06B8 0380 B806+  	dc.b	nC4, $03, nRst, nC4, $06, nG4, $03, nRst, nG4, $06, nE4, $03
-00238234 80B5 06B8 0380 B806 B003+  	dc.b	nRst, nE4, $06, nG4, $03, nRst, nG4, $06, nB3, $03, nRst, nB3
-00238240 06B6 0380 B606 B503 80B5+  	dc.b	$06, nF4, $03, nRst, nF4, $06, nE4, $03, nRst, nE4, $06, nB3
-0023824C 0380 B006                  	dc.b	$03, nRst, nB3, $06
-00238250 F800 00                    	smpsCall            Mus83_MZ_Call00
-00238253 B003 80B0 06B6 0380 B606+  	dc.b	nB3, $03, nRst, nB3, $06, nF4, $03, nRst, nF4, $06, nD4, $03
-0023825F 80B3 06B6 0380 B606 B503+  	dc.b	nRst, nD4, $06, nF4, $03, nRst, nF4, $06, nE4, $03, nRst, nE4
-0023826B 06BC 0380 BC06 B903 80B9+  	dc.b	$06, nB4, $03, nRst, nB4, $06, nAb4, $03, nRst, nAb4, $06, nB4
-00238277 0380 BC06 AE03 80AE 06B5+  	dc.b	$03, nRst, nB4, $06, nA3, $03, nRst, nA3, $06, nE4, $03, nRst
-00238283 B506 B103 80B1 06B5 0380+  	dc.b	nE4, $06, nC4, $03, nRst, nC4, $06, nE4, $03, nRst, nE4, $06
-0023828F AE03 80AE 06B5 0380 B506+  	dc.b	nA3, $03, nRst, nA3, $06, nE4, $03, nRst, nE4, $06, nD4, $03
-0023829B 80B3 06B5 0380 B506        	dc.b	nRst, nD4, $06, nE4, $03, nRst, nE4, $06
-002382A3                            
-002382A3                            Mus83_MZ_Loop01:
-002382A3 AE12 AE06 AC12 AC06 AA12+  	dc.b	nA3, $12, nA3, $06, nG3, $12, nG3, $06, nF3, $12, nF3, $06
-002382AF AC12 AC06                  	dc.b	nG3, $12, nG3, $06
-002382B3 F701 02FF EC               	smpsLoop            $01, $02, Mus83_MZ_Loop01
-002382B8 E201                       	smpsNop             $01
-002382BA F6FF 50                    	smpsJump            Mus83_MZ_Jump01
-002382BD                            
-002382BD                            Mus83_MZ_Call00:
-002382BD AE03 80AE 06B5 0380 B506+  	dc.b	nA3, $03, nRst, nA3, $06, nE4, $03, nRst, nE4, $06, nD4, $03
-002382C9 80B3 06B5 0380 B506        	dc.b	nRst, nD4, $06, nE4, $03, nRst, nE4, $06
-002382D1 F700 02FF E8               	smpsLoop            $00, $02, Mus83_MZ_Call00
-002382D6                            
-002382D6                            Mus83_MZ_Loop05:
-002382D6 B303 80B3 06BA 0380 BA06+  	dc.b	nD4, $03, nRst, nD4, $06, nA4, $03, nRst, nA4, $06, nF4, $03
-002382E2 80B6 06BA 0380 BA06        	dc.b	nRst, nF4, $06, nA4, $03, nRst, nA4, $06
-002382EA F700 02FF E8               	smpsLoop            $00, $02, Mus83_MZ_Loop05
-002382EF F9                         	smpsReturn
-002382F0                            
-002382F0                            ; PSG1 Data
-002382F0                            Mus83_MZ_PSG1:
-002382F0 803C                       	dc.b	nRst, $3C
-002382F2                            
-002382F2                            Mus83_MZ_Jump06:
-002382F2 8060                       	dc.b	nRst, $60
-002382F4 F800 00                    	smpsCall            Mus83_MZ_Call06
-002382F7 802A DA0C DA06 D70C D406+  	dc.b	nRst, $2A, nF7, $0C, nF7, $06, nD7, $0C, nB6, $06, nAb6, $2A
-00238303 8048                       	dc.b	nRst, $48
-00238305 F800 00                    	smpsCall            Mus83_MZ_Call06
-00238308 8060                       	dc.b	nRst, $60
-0023830A                            
-0023830A                            Mus83_MZ_Loop03:
-0023830A D206 D503 D2D5 06D2 D4D0+  	dc.b	nA6, $06, nC7, $03, nA6, nC7, $06, nA6, nB6, nG6, nD6, nB6
-00238316 CED2 03CE D206 CED0 D2D4+  	dc.b	nF6, nA6, $03, nF6, nA6, $06, nF6, nG6, nA6, nB6, nG6
-00238321 F700 02FF E5               	smpsLoop            $00, $02, Mus83_MZ_Loop03
-00238326 F6FF CA                    	smpsJump            Mus83_MZ_Jump06
-00238329                            
-00238329                            Mus83_MZ_Call06:
-00238329 8030 DA03 D7D2 CED7 D2CE+  	dc.b	nRst, $30, nF7, $03, nD7, nA6, nF6, nD7, nA6, nF6, nD6, nA6
-00238335 CECB C6CE CBC6 C227 803C   	dc.b	nF6, nD6, nA5, nF6, nD6, nA5, nF5, $27, nRst, $3C
-0023833F F9                         	smpsReturn
-00238340                            
-00238340                            ; PSG2 Data
-00238340                            Mus83_MZ_PSG2:
-00238340 8002                       	dc.b	nRst, $02
-00238342 E101                       	smpsAlterNote       $01
-00238344 F6FF AA                    	smpsJump            Mus83_MZ_PSG1
-00238347                            
-00238347                            ; PSG3 Data
-00238347                            Mus83_MZ_PSG3:
-00238347                            ;	smpsPSGform         $E7
-00238347 ECFF                       	smpsPSGAlterVol     $FF
-00238349 8006 C103 0306 80B5 24     	dc.b	nRst, $06, nE5, $03, $03, $06, nRst, nE4, $24
-00238352 EC01                       	smpsPSGAlterVol     $01
-00238354                            
-00238354                            Mus83_MZ_Jump05:
-00238354 F800 00                    	smpsCall            Mus83_MZ_Call05
-00238357 ACAC B3B3 B0B0 B3B3 ACAC+  	dc.b	nG3, nG3, nD4, nD4, nB3, nB3, nD4, nD4, nG3, nG3, nD4, nD4
-00238363 B0B0 B3B3 B1B1 B8B8 B5B5+  	dc.b	nB3, nB3, nD4, nD4, nC4, nC4, nG4, nG4, nE4, nE4, nG4, nG4
-0023836F B0B0 B6B6 B5B5 B0B0        	dc.b	nB3, nB3, nF4, nF4, nE4, nE4, nB3, nB3
-00238377 F800 00                    	smpsCall            Mus83_MZ_Call05
-0023837A B0B0 B6B6 B3B3 B6B6 B5B5+  	dc.b	nB3, nB3, nF4, nF4, nD4, nD4, nF4, nF4, nE4, nE4, nB4, nB4
-00238386 B9B9 BCBC AEAE B5B5 B1B1+  	dc.b	nAb4, nAb4, nB4, nB4, nA3, nA3, nE4, nE4, nC4, nC4, nE4, nE4
-00238392 AEAE B5B5 B3B3 B5B5        	dc.b	nA3, nA3, nE4, nE4, nD4, nD4, nE4, nE4
-0023839A ECFF                       	smpsPSGAlterVol     $FF
-0023839C                            
-0023839C                            Mus83_MZ_Loop02:
-0023839C BA12 BA06 B812 B806 B612+  	dc.b	nA4, $12, nA4, $06, nG4, $12, nG4, $06, nF4, $12, nF4, $06
-002383A8 B812 B806                  	dc.b	nG4, $12, nG4, $06
-002383AC F700 02FF EC               	smpsLoop            $00, $02, Mus83_MZ_Loop02
-002383B1 EC01                       	smpsPSGAlterVol     $01
-002383B3 F6FF 9F                    	smpsJump            Mus83_MZ_Jump05
-002383B6                            
-002383B6                            Mus83_MZ_Call05:
-002383B6 AE06 AEB5 B5B3 B3B5 B5AE+  	dc.b	nA3, $06, nA3, nE4, nE4, nD4, nD4, nE4, nE4, nA3, nA3, nE4
-002383C2 B5B3 B3B5 B5B3 B3BA BAB6+  	dc.b	nE4, nD4, nD4, nE4, nE4, nD4, nD4, nA4, nA4, nF4, nF4, nA4
-002383CE BAB3 B3BA BAB6 B6BA BA     	dc.b	nA4, nD4, nD4, nA4, nA4, nF4, nF4, nA4, nA4
-002383D7 F9                         	smpsReturn
-002383D8                            
-002383D8                            ; DAC Data
-002383D8                            Mus83_MZ_DAC:
-002383D8 8006 8703 030C 810C 0C0C   	dc.b	nRst, $06, dSnare, $03, $03, $0C, dKick, $0C, $0C, $0C
-002383E2                            
-002383E2                            Mus83_MZ_Jump00:
-002383E2 810C                       	dc.b	dKick, $0C
-002383E4 F6FF FC                    	smpsJump            Mus83_MZ_Jump00
-002383E7                            
-002383E7                            Mus83_MZ_Call02:
-002383E7 8005                       	dc.b	nRst, $05
-002383E9                            
-002383E9                            Mus83_MZ_Loop04:
-002383E9 8001 D903 80D5 80D2 8009   	dc.b	nRst, $01, nE7, $03, nRst, nC7, nRst, nA6, nRst, $09
-002383F3 D703 80D4 80D0 8009        	dc.b	nD7, $03, nRst, nB6, nRst, nG6, nRst, $09
-002383FB D503 80D2 80CE 8009        	dc.b	nC7, $03, nRst, nA6, nRst, nF6, nRst, $09
-00238403 D703 80D4 80D0 8008        	dc.b	nD7, $03, nRst, nB6, nRst, nG6, nRst, $08
-0023840B F700 02FF DA               	smpsLoop            $00, $02, Mus83_MZ_Loop04
-00238410 F9                         	smpsReturn
-00238411                            
-00238411                            Mus83_MZ_Voices:
-00238411                            ;	Voice $00
-00238411                            ;	$22
-00238411                            ;	$0A, $13, $05, $11, 	$03, $12, $12, $11, 	$00, $13, $13, $00
-00238411                            ;	$03, $02, $02, $01, 	$1F, $1F, $0F, $0F, 	$1E, $18, $26, $81
-00238411                            	smpsVcAlgorithm     $02
-00238411                            	smpsVcFeedback      $04
-00238411                            	smpsVcUnusedBits    $00
-00238411                            	smpsVcDetune        $01, $00, $01, $00
-00238411                            	smpsVcCoarseFreq    $01, $05, $03, $0A
-00238411                            	smpsVcRateScale     $00, $00, $00, $00
-00238411                            	smpsVcAttackRate    $11, $12, $12, $03
-00238411                            	smpsVcAmpMod        $00, $00, $00, $00
-00238411                            	smpsVcDecayRate1    $00, $13, $13, $00
-00238411                            	smpsVcDecayRate2    $01, $02, $02, $03
-00238411                            	smpsVcDecayLevel    $00, $00, $01, $01
-00238411                            	smpsVcReleaseRate   $0F, $0F, $0F, $0F
-00238411 220A 1305 1103 1212 1100+  	smpsVcTotalLevel    $01, $26, $18, $1E
-0023842A                            
-0023842A                            ;	Voice $01
-0023842A                            ;	$3A
-0023842A                            ;	$61, $3C, $14, $31, 	$9C, $DB, $9C, $DA, 	$04, $09, $04, $03
-0023842A                            ;	$03, $01, $03, $00, 	$1F, $0F, $0F, $AF, 	$21, $47, $31, $80
-0023842A                            	smpsVcAlgorithm     $02
-0023842A                            	smpsVcFeedback      $07
-0023842A                            	smpsVcUnusedBits    $00
-0023842A                            	smpsVcDetune        $03, $01, $03, $06
-0023842A                            	smpsVcCoarseFreq    $01, $04, $0C, $01
-0023842A                            	smpsVcRateScale     $03, $02, $03, $02
-0023842A                            	smpsVcAttackRate    $1A, $1C, $1B, $1C
-0023842A                            	smpsVcAmpMod        $00, $00, $00, $00
-0023842A                            	smpsVcDecayRate1    $03, $04, $09, $04
-0023842A                            	smpsVcDecayRate2    $00, $03, $01, $03
-0023842A                            	smpsVcDecayLevel    $0A, $00, $00, $01
-0023842A                            	smpsVcReleaseRate   $0F, $0F, $0F, $0F
-0023842A 3A61 3C14 319C DB9C DA04+  	smpsVcTotalLevel    $00, $31, $47, $21
-00238443                            
-00238443                            ;	Voice $02
-00238443                            ;	$3A
-00238443                            ;	$01, $07, $01, $01, 	$8E, $8E, $8D, $53, 	$0E, $0E, $0E, $03
-00238443                            ;	$00, $00, $00, $00, 	$1F, $FF, $1F, $0F, 	$18, $28, $27, $80
-00238443                            	smpsVcAlgorithm     $02
-00238443                            	smpsVcFeedback      $07
-00238443                            	smpsVcUnusedBits    $00
-00238443                            	smpsVcDetune        $00, $00, $00, $00
-00238443                            	smpsVcCoarseFreq    $01, $01, $07, $01
-00238443                            	smpsVcRateScale     $01, $02, $02, $02
-00238443                            	smpsVcAttackRate    $13, $0D, $0E, $0E
-00238443                            	smpsVcAmpMod        $00, $00, $00, $00
-00238443                            	smpsVcDecayRate1    $03, $0E, $0E, $0E
-00238443                            	smpsVcDecayRate2    $00, $00, $00, $00
-00238443                            	smpsVcDecayLevel    $00, $01, $0F, $01
-00238443                            	smpsVcReleaseRate   $0F, $0F, $0F, $0F
-00238443 3A01 0701 018E 8E8D 530E+  	smpsVcTotalLevel    $00, $27, $28, $18
-0023845C                            
-0023845C                            ;	Voice $03
-0023845C                            ;	$23
-0023845C                            ;	$7C, $32, $00, $00, 	$5F, $58, $DC, $DF, 	$04, $0B, $04, $04
-0023845C                            ;	$06, $0C, $08, $08, 	$1F, $1F, $BF, $BF, 	$24, $26, $16, $80
-0023845C                            	smpsVcAlgorithm     $03
-0023845C                            	smpsVcFeedback      $04
-0023845C                            	smpsVcUnusedBits    $00
-0023845C                            	smpsVcDetune        $00, $00, $03, $07
-0023845C                            	smpsVcCoarseFreq    $00, $00, $02, $0C
-0023845C                            	smpsVcRateScale     $03, $03, $01, $01
-0023845C                            	smpsVcAttackRate    $1F, $1C, $18, $1F
-0023845C                            	smpsVcAmpMod        $00, $00, $00, $00
-0023845C                            	smpsVcDecayRate1    $04, $04, $0B, $04
-0023845C                            	smpsVcDecayRate2    $08, $08, $0C, $06
-0023845C                            	smpsVcDecayLevel    $0B, $0B, $01, $01
-0023845C                            	smpsVcReleaseRate   $0F, $0F, $0F, $0F
-0023845C 237C 3200 005F 58DC DF04+  	smpsVcTotalLevel    $00, $16, $26, $24
-00238475                            
-00238475                            ;	Voice $04
-00238475                            ;	$02
-00238475                            ;	$3C, $32, $55, $51, 	$1F, $98, $1F, $9F, 	$0F, $11, $0E, $11
-00238475                            ;	$0E, $05, $08, $05, 	$5F, $0F, $6F, $0F, 	$2D, $2D, $2F, $80
-00238475                            	smpsVcAlgorithm     $02
-00238475                            	smpsVcFeedback      $00
-00238475                            	smpsVcUnusedBits    $00
-00238475                            	smpsVcDetune        $05, $05, $03, $03
-00238475                            	smpsVcCoarseFreq    $01, $05, $02, $0C
-00238475                            	smpsVcRateScale     $02, $00, $02, $00
-00238475                            	smpsVcAttackRate    $1F, $1F, $18, $1F
-00238475                            	smpsVcAmpMod        $00, $00, $00, $00
-00238475                            	smpsVcDecayRate1    $11, $0E, $11, $0F
-00238475                            	smpsVcDecayRate2    $05, $08, $05, $0E
-00238475                            	smpsVcDecayLevel    $00, $06, $00, $05
-00238475                            	smpsVcReleaseRate   $0F, $0F, $0F, $0F
-00238475 023C 3255 511F 981F 9F0F+  	smpsVcTotalLevel    $00, $2F, $2D, $2D
-0023848E                            
-0023848E                            
-0023848E                            				
-0023848E                            ;	============================================================================!
-0023848E                            		align		$300000				 ;	LOADING SCREEN						!
+002380CF E703 80D4 80D5 0680 D40C+  	dc.b	smpsNoAttack, $03, nRst, nB6, nRst, nC7, $06, nRst, nB6, $0C, nRst, $06
+002380DB D409 8003 D480 D506 80D4+  	dc.b	nB6, $09, nRst, $03, nB6, nRst, nC7, $06, nRst, nB6, $0C, nRst
+002380E7 18D5 0380 0FD5 0380 1BD5+  	dc.b	$18, nC7, $03, nRst, $0F, nC7, $03, nRst, $1B, nC7, $03, nRst
+002380F3 0FD5 0380 09               	dc.b	$0F, nC7, $03, nRst, $09
+002380F8 D209 8003 D280 D406 80D2+  	dc.b	nA6, $09, nRst, $03, nA6, nRst, nB6, $06, nRst, nA6, $0C, nRst
+00238104 06D2 0980 03D2 80D4 0680+  	dc.b	$06, nA6, $09, nRst, $03, nA6, nRst, nB6, $06, nRst, nA6, $0C
+00238110 8018 D003 800F D003 8039+  	dc.b	nRst, $18, nG6, $03, nRst, $0F, nG6, $03, nRst, $39, nB6, $06
+0023811C E703 80D4 80D5 0680 D40C+  	dc.b	smpsNoAttack, $03, nRst, nB6, nRst, nC7, $06, nRst, nB6, $0C, nRst, $06
+00238128 D409 8003 D480 D506 80D4+  	dc.b	nB6, $09, nRst, $03, nB6, nRst, nC7, $06, nRst, nB6, $0C, nRst
+00238134 18D5 0380 0FD5 0380 1BD5+  	dc.b	$18, nC7, $03, nRst, $0F, nC7, $03, nRst, $1B, nC7, $03, nRst
+00238140 0FD5 0380 09               	dc.b	$0F, nC7, $03, nRst, $09
+00238145 CE09 8003 CE80 D206 80CE+  	dc.b	nF6, $09, nRst, $03, nF6, nRst, nA6, $06, nRst, nF6, $0C, nRst
+00238151 06D1 0980 03D1 80D4 0680+  	dc.b	$06, nAb6, $09, nRst, $03, nAb6, nRst, nB6, $06, nRst, nAb6, $0C
+0023815D 8018 D503 800F D503 8009+  	dc.b	nRst, $18, nC7, $03, nRst, $0F, nC7, $03, nRst, $09, nE7, $09
+00238169 8003 D980 D706 80D5 0380+  	dc.b	nRst, $03, nE7, nRst, nD7, $06, nRst, nC7, $03, nRst, nB6, $12
+00238175 8006                       	dc.b	nRst, $06
+00238177                            
+00238177 D903 80D5 80D2 8009        	dc.b	nE7, $03, nRst, nC7, nRst, nA6, nRst, $09
+0023817F D703 80D4 80D0 8009        	dc.b	nD7, $03, nRst, nB6, nRst, nG6, nRst, $09
+00238187 D503 80D2 80CE 8009        	dc.b	nC7, $03, nRst, nA6, nRst, nF6, nRst, $09
+0023818F D703 80D4 80D0 8009        	dc.b	nD7, $03, nRst, nB6, nRst, nG6, nRst, $09
+00238197 D903 80D5 80D2 8009        	dc.b	nE7, $03, nRst, nC7, nRst, nA6, nRst, $09
+0023819F D703 80D4 80D0 8009        	dc.b	nD7, $03, nRst, nB6, nRst, nG6, nRst, $09
+002381A7 D503 80D2 80CE 8009        	dc.b	nC7, $03, nRst, nA6, nRst, nF6, nRst, $09
+002381AF D703 80D4 80D0 8009        	dc.b	nD7, $03, nRst, nB6, nRst, nG6, nRst, $09
+002381B7 F6FF 16                    	smpsJump            Mus83_MZ_Jump03
+002381BA                            
+002381BA                            ; FM5 Data
+002381BA                            Mus83_MZ_FM5:
+002381BC E6FC                       	smpsAlterVol        $FC
+002381BE FB24                       	smpsAlterPitch      $24
+002381C0 8006 B503 0306 80A9 1E     	dc.b	nRst, $06, nE4, $03, $03, $06, nRst, nE3, $1E
+002381CB FBDC                       	smpsAlterPitch      $DC
+002381CD E604                       	smpsAlterVol        $04
+002381CF D006                       	dc.b	nG6, $06
+002381D1                            
+002381D1                            Mus83_MZ_Jump02:
+002381D1 E703 80D0 80D2 0680 D00C+  	dc.b	smpsNoAttack, $03, nRst, nG6, nRst, nA6, $06, nRst, nG6, $0C, nRst, $06
+002381DD D009 8003 D080 D206 80D0+  	dc.b	nG6, $09, nRst, $03, nG6, nRst, nA6, $06, nRst, nG6, $0C, nRst
+002381E9 18D2 0380 0FD2 0380 1BD2+  	dc.b	$18, nA6, $03, nRst, $0F, nA6, $03, nRst, $1B, nA6, $03, nRst
+002381F5 0FD2 0380 09               	dc.b	$0F, nA6, $03, nRst, $09
+002381FA CE09 8003 CE80 D006 80CE+  	dc.b	nF6, $09, nRst, $03, nF6, nRst, nG6, $06, nRst, nF6, $0C, nRst
+00238206 06CE 0980 03CE 80D0 0680+  	dc.b	$06, nF6, $09, nRst, $03, nF6, nRst, nG6, $06, nRst, nF6, $0C
+00238212 8018 CD03 800F CD03 8039+  	dc.b	nRst, $18, nE6, $03, nRst, $0F, nE6, $03, nRst, $39, nG6, $06
+0023821E E703 80D0 80D2 0680 D00C+  	dc.b	smpsNoAttack, $03, nRst, nG6, nRst, nA6, $06, nRst, nG6, $0C, nRst, $06
+0023822A D009 8003 D080 D206 80D0+  	dc.b	nG6, $09, nRst, $03, nG6, nRst, nA6, $06, nRst, nG6, $0C, nRst
+00238236 18D2 0380 0FD2 0380 1BD2+  	dc.b	$18, nA6, $03, nRst, $0F, nA6, $03, nRst, $1B, nA6, $03, nRst
+00238242 0FD2 0380 09               	dc.b	$0F, nA6, $03, nRst, $09
+00238247 CB09 8003 CB80 CE06 80CB+  	dc.b	nD6, $09, nRst, $03, nD6, nRst, nF6, $06, nRst, nD6, $0C, nRst
+00238253 06CD 0980 03CD 80D1 0680+  	dc.b	$06, nE6, $09, nRst, $03, nE6, nRst, nAb6, $06, nRst, nE6, $0C
+0023825F 8018 D203 800F D203 8009+  	dc.b	nRst, $18, nA6, $03, nRst, $0F, nA6, $03, nRst, $09, nC7, $09
+0023826B 8003 D580 D406 80D2 0380+  	dc.b	nRst, $03, nC7, nRst, nB6, $06, nRst, nA6, $03, nRst, nAb6, $12
+00238277 E103                       	smpsAlterNote       $03
+00238279 8006                       	dc.b	nRst, $06
+0023827B                            
+0023827B D903 80D5 80D2 8009        	dc.b	nE7, $03, nRst, nC7, nRst, nA6, nRst, $09
+00238283 D703 80D4 80D0 8009        	dc.b	nD7, $03, nRst, nB6, nRst, nG6, nRst, $09
+0023828B D503 80D2 80CE 8009        	dc.b	nC7, $03, nRst, nA6, nRst, nF6, nRst, $09
+00238293 D703 80D4 80D0 8009        	dc.b	nD7, $03, nRst, nB6, nRst, nG6, nRst, $09
+0023829B D903 80D5 80D2 8009        	dc.b	nE7, $03, nRst, nC7, nRst, nA6, nRst, $09
+002382A3 D703 80D4 80D0 8009        	dc.b	nD7, $03, nRst, nB6, nRst, nG6, nRst, $09
+002382AB D503 80D2 80CE 8009        	dc.b	nC7, $03, nRst, nA6, nRst, nF6, nRst, $09
+002382B3 D703 80D4 80D0 8009        	dc.b	nD7, $03, nRst, nB6, nRst, nG6, nRst, $09
+002382BB E100                       	smpsAlterNote       $00
+002382BD F6FF 12                    	smpsJump            Mus83_MZ_Jump02
+002382C0                            
+002382C0                            
+002382C0                            ; FM2 Data
+002382C0                            Mus83_MZ_FM2:
+002382C2 8006 B503 B5               	dc.b	nRst, $06, nE4, $03, nE4
+002382C7 E201                       	smpsNop             $01
+002382C9 B506 80A9 24               	dc.b	nE4, $06, nRst, nE3, $24
+002382CE                            
+002382CE                            Mus83_MZ_Jump01:
+002382CE AE03 80AE 06B5 0380 B506+  	dc.b	nA3, $03, nRst, nA3, $06, nE4, $03, nRst, nE4, $06, nD4, $03
+002382DA 80B3 06B5 0380 B506        	dc.b	nRst, nD4, $06, nE4, $03, nRst, nE4, $06
+002382E2 AE03 80AE 06B5 0380 B506+  	dc.b	nA3, $03, nRst, nA3, $06, nE4, $03, nRst, nE4, $06, nD4, $03
+002382EE 80B3 06B5 0380 B506        	dc.b	nRst, nD4, $06, nE4, $03, nRst, nE4, $06
+002382F6 B303 80B3 06BA 0380 BA06+  	dc.b	nD4, $03, nRst, nD4, $06, nA4, $03, nRst, nA4, $06, nF4, $03
+00238302 80B6 06BA 0380 BA06        	dc.b	nRst, nF4, $06, nA4, $03, nRst, nA4, $06
+0023830A B303 80B3 06BA 0380 BA06+  	dc.b	nD4, $03, nRst, nD4, $06, nA4, $03, nRst, nA4, $06, nF4, $03
+00238316 80B6 06BA 0380 BA06        	dc.b	nRst, nF4, $06, nA4, $03, nRst, nA4, $06
+0023831E AC03 80AC 06B3 0380 B306+  	dc.b	nG3, $03, nRst, nG3, $06, nD4, $03, nRst, nD4, $06, nB3, $03
+0023832A 80B0 06B3 0380 B306        	dc.b	nRst, nB3, $06, nD4, $03, nRst, nD4, $06
+00238332 AC03 80AC 06B3 0380 B306+  	dc.b	nG3, $03, nRst, nG3, $06, nD4, $03, nRst, nD4, $06, nB3, $03
+0023833E 80B0 06B3 0380 B306        	dc.b	nRst, nB3, $06, nD4, $03, nRst, nD4, $06
+00238346 B103 80B1 06B8 0380 B806+  	dc.b	nC4, $03, nRst, nC4, $06, nG4, $03, nRst, nG4, $06, nE4, $03
+00238352 80B5 06B8 0380 B806 B003+  	dc.b	nRst, nE4, $06, nG4, $03, nRst, nG4, $06, nB3, $03, nRst, nB3
+0023835E 06B6 0380 B606 B503 80B5+  	dc.b	$06, nF4, $03, nRst, nF4, $06, nE4, $03, nRst, nE4, $06, nB3
+0023836A 0380 B006                  	dc.b	$03, nRst, nB3, $06
+0023836E AE03 80AE 06B5 0380 B506+  	dc.b	nA3, $03, nRst, nA3, $06, nE4, $03, nRst, nE4, $06, nD4, $03
+0023837A 80B3 06B5 0380 B506        	dc.b	nRst, nD4, $06, nE4, $03, nRst, nE4, $06
+00238382 AE03 80AE 06B5 0380 B506+  	dc.b	nA3, $03, nRst, nA3, $06, nE4, $03, nRst, nE4, $06, nD4, $03
+0023838E 80B3 06B5 0380 B506        	dc.b	nRst, nD4, $06, nE4, $03, nRst, nE4, $06
+00238396 B303 80B3 06BA 0380 BA06+  	dc.b	nD4, $03, nRst, nD4, $06, nA4, $03, nRst, nA4, $06, nF4, $03
+002383A2 80B6 06BA 0380 BA06        	dc.b	nRst, nF4, $06, nA4, $03, nRst, nA4, $06
+002383AA B303 80B3 06BA 0380 BA06+  	dc.b	nD4, $03, nRst, nD4, $06, nA4, $03, nRst, nA4, $06, nF4, $03
+002383B6 80B6 06BA 0380 BA06        	dc.b	nRst, nF4, $06, nA4, $03, nRst, nA4, $06
+002383BE B003 80B0 06B6 0380 B606+  	dc.b	nB3, $03, nRst, nB3, $06, nF4, $03, nRst, nF4, $06, nD4, $03
+002383CA 80B3 06B6 0380 B606 B503+  	dc.b	nRst, nD4, $06, nF4, $03, nRst, nF4, $06, nE4, $03, nRst, nE4
+002383D6 06BC 0380 BC06 B903 80B9+  	dc.b	$06, nB4, $03, nRst, nB4, $06, nAb4, $03, nRst, nAb4, $06, nB4
+002383E2 0380 BC06 AE03 80AE 06B5+  	dc.b	$03, nRst, nB4, $06, nA3, $03, nRst, nA3, $06, nE4, $03, nRst
+002383EE B506 B103 80B1 06B5 0380+  	dc.b	nE4, $06, nC4, $03, nRst, nC4, $06, nE4, $03, nRst, nE4, $06
+002383FA AE03 80AE 06B5 0380 B506+  	dc.b	nA3, $03, nRst, nA3, $06, nE4, $03, nRst, nE4, $06, nD4, $03
+00238406 80B3 06B5 0380 B506        	dc.b	nRst, nD4, $06, nE4, $03, nRst, nE4, $06
+0023840E AE12 AE06 AC12 AC06 AA12+  	dc.b	nA3, $12, nA3, $06, nG3, $12, nG3, $06, nF3, $12, nF3, $06
+0023841A AC12 AC06                  	dc.b	nG3, $12, nG3, $06
+0023841E AE12 AE06 AC12 AC06 AA12+  	dc.b	nA3, $12, nA3, $06, nG3, $12, nG3, $06, nF3, $12, nF3, $06
+0023842A AC12 AC06                  	dc.b	nG3, $12, nG3, $06
+0023842E E201                       	smpsNop             $01
+00238430 F6FE 9C                    	smpsJump            Mus83_MZ_Jump01
+00238433                            
+00238433                            
+00238433                            
+00238433                            ; PSG2 Data
+00238433                            Mus83_MZ_PSG2:
+00238433 8002                       	dc.b	nRst, $02
+00238435 E101                       	smpsAlterNote       $01
+00238437                            
+00238437                            ; PSG1 Data
+00238437                            Mus83_MZ_PSG1:
+00238437 803C                       	dc.b	nRst, $3C
+00238439                            
+00238439                            Mus83_MZ_Jump06:
+00238439 8060                       	dc.b	nRst, $60
+0023843B 8030 DA03 D7D2 CED7 D2CE+  	dc.b	nRst, $30, nF7, $03, nD7, nA6, nF6, nD7, nA6, nF6, nD6, nA6
+00238447 CECB C6CE CBC6 C227 803C   	dc.b	nF6, nD6, nA5, nF6, nD6, nA5, nF5, $27, nRst, $3C
+00238451 802A DA0C DA06 D70C D406+  	dc.b	nRst, $2A, nF7, $0C, nF7, $06, nD7, $0C, nB6, $06, nAb6, $2A
+0023845D 8048                       	dc.b	nRst, $48
+0023845F 8030 DA03 D7D2 CED7 D2CE+  	dc.b	nRst, $30, nF7, $03, nD7, nA6, nF6, nD7, nA6, nF6, nD6, nA6
+0023846B CECB C6CE CBC6 C227 803C   	dc.b	nF6, nD6, nA5, nF6, nD6, nA5, nF5, $27, nRst, $3C
+00238475 8060                       	dc.b	nRst, $60
+00238477 D206 D503 D2D5 06D2 D4D0+  	dc.b	nA6, $06, nC7, $03, nA6, nC7, $06, nA6, nB6, nG6, nD6, nB6
+00238483 CED2 03CE D206 CED0 D2D4+  	dc.b	nF6, nA6, $03, nF6, nA6, $06, nF6, nG6, nA6, nB6, nG6
+0023848E D2D5 03D2 D506 D2D4 D0CB+  	dc.b	nA6, nC7, $03, nA6, nC7, $06, nA6, nB6, nG6, nD6, nB6
+00238499 CED2 03CE D206 CED0 D2D4+  	dc.b	nF6, nA6, $03, nF6, nA6, $06, nF6, nG6, nA6, nB6, nG6
+002384A4 F6FF 93                    	smpsJump            Mus83_MZ_Jump06
+002384A7                            
+002384A7                            
+002384A7                            ; PSG3 Data
+002384A7                            Mus83_MZ_PSG3:
+002384A7                            ;	smpsPSGform         $E7
+002384A7 ECFF                       	smpsPSGAlterVol     $FF
+002384A9 8006 C103 0306 80B5 24     	dc.b	nRst, $06, nE5, $03, $03, $06, nRst, nE4, $24
+002384B2 EC01                       	smpsPSGAlterVol     $01
+002384B4                            
+002384B4                            Mus83_MZ_Jump05:
+002384B4 F800 00                    	smpsCall            Mus83_MZ_Call05
+002384B7 ACAC B3B3 B0B0 B3B3 ACAC+  	dc.b	nG3, nG3, nD4, nD4, nB3, nB3, nD4, nD4, nG3, nG3, nD4, nD4
+002384C3 B0B0 B3B3 B1B1 B8B8 B5B5+  	dc.b	nB3, nB3, nD4, nD4, nC4, nC4, nG4, nG4, nE4, nE4, nG4, nG4
+002384CF B0B0 B6B6 B5B5 B0B0        	dc.b	nB3, nB3, nF4, nF4, nE4, nE4, nB3, nB3
+002384D7 F800 00                    	smpsCall            Mus83_MZ_Call05
+002384DA B0B0 B6B6 B3B3 B6B6 B5B5+  	dc.b	nB3, nB3, nF4, nF4, nD4, nD4, nF4, nF4, nE4, nE4, nB4, nB4
+002384E6 B9B9 BCBC AEAE B5B5 B1B1+  	dc.b	nAb4, nAb4, nB4, nB4, nA3, nA3, nE4, nE4, nC4, nC4, nE4, nE4
+002384F2 AEAE B5B5 B3B3 B5B5        	dc.b	nA3, nA3, nE4, nE4, nD4, nD4, nE4, nE4
+002384FA ECFF                       	smpsPSGAlterVol     $FF
+002384FC                            
+002384FC                            Mus83_MZ_Loop02:
+002384FC BA12 BA06 B812 B806 B612+  	dc.b	nA4, $12, nA4, $06, nG4, $12, nG4, $06, nF4, $12, nF4, $06
+00238508 B812 B806                  	dc.b	nG4, $12, nG4, $06
+0023850C F700 02FF EC               	smpsLoop            $00, $02, Mus83_MZ_Loop02
+00238511 EC01                       	smpsPSGAlterVol     $01
+00238513 F6FF 9F                    	smpsJump            Mus83_MZ_Jump05
+00238516                            
+00238516                            Mus83_MZ_Call05:
+00238516 AE06 AEB5 B5B3 B3B5 B5AE+  	dc.b	nA3, $06, nA3, nE4, nE4, nD4, nD4, nE4, nE4, nA3, nA3, nE4
+00238522 B5B3 B3B5 B5B3 B3BA BAB6+  	dc.b	nE4, nD4, nD4, nE4, nE4, nD4, nD4, nA4, nA4, nF4, nF4, nA4
+0023852E BAB3 B3BA BAB6 B6BA BA     	dc.b	nA4, nD4, nD4, nA4, nA4, nF4, nF4, nA4, nA4
+00238537 F9                         	smpsReturn
+00238538                            
+00238538                            ; DAC Data
+00238538                            Mus83_MZ_DAC:
+00238538 8006 8703 030C 810C 0C0C   	dc.b	nRst, $06, dSnare, $03, $03, $0C, dKick, $0C, $0C, $0C
+00238542                            
+00238542                            Mus83_MZ_Jump00:
+00238542 810C                       	dc.b	dKick, $0C
+00238544 F6FF FC                    	smpsJump            Mus83_MZ_Jump00
+00238547                            
+00238547                            Mus83_MZ_Call02:
+00238547                            
+00238547                            
+00238547 F9                         	smpsReturn
+00238548                            
+00238548                            Mus83_MZ_Voices:
+00238548                            ;	Voice $00
+00238548                            ;	$22
+00238548                            ;	$0A, $13, $05, $11, 	$03, $12, $12, $11, 	$00, $13, $13, $00
+00238548                            ;	$03, $02, $02, $01, 	$1F, $1F, $0F, $0F, 	$1E, $18, $26, $81
+00238548                            	smpsVcAlgorithm     $02
+00238548                            	smpsVcFeedback      $04
+00238548                            	smpsVcUnusedBits    $00
+00238548                            	smpsVcDetune        $01, $00, $01, $00
+00238548                            	smpsVcCoarseFreq    $01, $05, $03, $0A
+00238548                            	smpsVcRateScale     $00, $00, $00, $00
+00238548                            	smpsVcAttackRate    $11, $12, $12, $03
+00238548                            	smpsVcAmpMod        $00, $00, $00, $00
+00238548                            	smpsVcDecayRate1    $00, $13, $13, $00
+00238548                            	smpsVcDecayRate2    $01, $02, $02, $03
+00238548                            	smpsVcDecayLevel    $00, $00, $01, $01
+00238548                            	smpsVcReleaseRate   $0F, $0F, $0F, $0F
+00238548 220A 1305 1103 1212 1100+  	smpsVcTotalLevel    $01, $26, $18, $1E
+00238561                            
+00238561                            ;	Voice $01
+00238561                            ;	$3A
+00238561                            ;	$61, $3C, $14, $31, 	$9C, $DB, $9C, $DA, 	$04, $09, $04, $03
+00238561                            ;	$03, $01, $03, $00, 	$1F, $0F, $0F, $AF, 	$21, $47, $31, $80
+00238561                            	smpsVcAlgorithm     $02
+00238561                            	smpsVcFeedback      $07
+00238561                            	smpsVcUnusedBits    $00
+00238561                            	smpsVcDetune        $03, $01, $03, $06
+00238561                            	smpsVcCoarseFreq    $01, $04, $0C, $01
+00238561                            	smpsVcRateScale     $03, $02, $03, $02
+00238561                            	smpsVcAttackRate    $1A, $1C, $1B, $1C
+00238561                            	smpsVcAmpMod        $00, $00, $00, $00
+00238561                            	smpsVcDecayRate1    $03, $04, $09, $04
+00238561                            	smpsVcDecayRate2    $00, $03, $01, $03
+00238561                            	smpsVcDecayLevel    $0A, $00, $00, $01
+00238561                            	smpsVcReleaseRate   $0F, $0F, $0F, $0F
+00238561 3A61 3C14 319C DB9C DA04+  	smpsVcTotalLevel    $00, $31, $47, $21
+0023857A                            
+0023857A                            ;	Voice $02
+0023857A                            ;	$3A
+0023857A                            ;	$01, $07, $01, $01, 	$8E, $8E, $8D, $53, 	$0E, $0E, $0E, $03
+0023857A                            ;	$00, $00, $00, $00, 	$1F, $FF, $1F, $0F, 	$18, $28, $27, $80
+0023857A                            	smpsVcAlgorithm     $02
+0023857A                            	smpsVcFeedback      $07
+0023857A                            	smpsVcUnusedBits    $00
+0023857A                            	smpsVcDetune        $00, $00, $00, $00
+0023857A                            	smpsVcCoarseFreq    $01, $01, $07, $01
+0023857A                            	smpsVcRateScale     $01, $02, $02, $02
+0023857A                            	smpsVcAttackRate    $13, $0D, $0E, $0E
+0023857A                            	smpsVcAmpMod        $00, $00, $00, $00
+0023857A                            	smpsVcDecayRate1    $03, $0E, $0E, $0E
+0023857A                            	smpsVcDecayRate2    $00, $00, $00, $00
+0023857A                            	smpsVcDecayLevel    $00, $01, $0F, $01
+0023857A                            	smpsVcReleaseRate   $0F, $0F, $0F, $0F
+0023857A 3A01 0701 018E 8E8D 530E+  	smpsVcTotalLevel    $00, $27, $28, $18
+00238593                            
+00238593                            ;	Voice $03
+00238593                            ;	$23
+00238593                            ;	$7C, $32, $00, $00, 	$5F, $58, $DC, $DF, 	$04, $0B, $04, $04
+00238593                            ;	$06, $0C, $08, $08, 	$1F, $1F, $BF, $BF, 	$24, $26, $16, $80
+00238593                            	smpsVcAlgorithm     $03
+00238593                            	smpsVcFeedback      $04
+00238593                            	smpsVcUnusedBits    $00
+00238593                            	smpsVcDetune        $00, $00, $03, $07
+00238593                            	smpsVcCoarseFreq    $00, $00, $02, $0C
+00238593                            	smpsVcRateScale     $03, $03, $01, $01
+00238593                            	smpsVcAttackRate    $1F, $1C, $18, $1F
+00238593                            	smpsVcAmpMod        $00, $00, $00, $00
+00238593                            	smpsVcDecayRate1    $04, $04, $0B, $04
+00238593                            	smpsVcDecayRate2    $08, $08, $0C, $06
+00238593                            	smpsVcDecayLevel    $0B, $0B, $01, $01
+00238593                            	smpsVcReleaseRate   $0F, $0F, $0F, $0F
+00238593 237C 3200 005F 58DC DF04+  	smpsVcTotalLevel    $00, $16, $26, $24
+002385AC                            
+002385AC                            ;	Voice $04
+002385AC                            ;	$02
+002385AC                            ;	$3C, $32, $55, $51, 	$1F, $98, $1F, $9F, 	$0F, $11, $0E, $11
+002385AC                            ;	$0E, $05, $08, $05, 	$5F, $0F, $6F, $0F, 	$2D, $2D, $2F, $80
+002385AC                            	smpsVcAlgorithm     $02
+002385AC                            	smpsVcFeedback      $00
+002385AC                            	smpsVcUnusedBits    $00
+002385AC                            	smpsVcDetune        $05, $05, $03, $03
+002385AC                            	smpsVcCoarseFreq    $01, $05, $02, $0C
+002385AC                            	smpsVcRateScale     $02, $00, $02, $00
+002385AC                            	smpsVcAttackRate    $1F, $1F, $18, $1F
+002385AC                            	smpsVcAmpMod        $00, $00, $00, $00
+002385AC                            	smpsVcDecayRate1    $11, $0E, $11, $0F
+002385AC                            	smpsVcDecayRate2    $05, $08, $05, $0E
+002385AC                            	smpsVcDecayLevel    $00, $06, $00, $05
+002385AC                            	smpsVcReleaseRate   $0F, $0F, $0F, $0F
+002385AC 023C 3255 511F 981F 9F0F+  	smpsVcTotalLevel    $00, $2F, $2D, $2D
+002385C5                            
+002385C5                            
+002385C5                            				
+002385C5                            ;	============================================================================!
+002385C5                            		align		$300000				 ;	LOADING SCREEN						!
 00300000                            ;	============================================================================! 
 00300000                            
 00300000 =0000C000                  PLANE_A		=	$C000

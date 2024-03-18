@@ -22,44 +22,63 @@ copyTilemap:	macro source,loc,width,height
 											
 CustomGameMode:				             ;	
 		
-		jsr	SHC				             ;	Play SHC screen
+;		jsr	SHC				             ;	Play SHC screen
 	
-;		lea		VDPCTRL,	A6
-;	;	move.w	#$8000+%00000001,(A6)
-;		move.w	#$8100+%01010100,(A6)
-;		move.w	#$8200+(PLANE_A/$400),(A6)
-;		move.w	#$8400+(PLANE_B/$2000),(A6)
-;		move.l	#CRAMWRITE,	VDPCTRL
-;		move.w	#$0000,	VDPDATA
-;		move.w	#$00EE,	VDPDATA
-;		move.w	#$00CE,	VDPDATA
-;		move.w	#$008C,	VDPDATA
-;		move.w	#$0004,	VDPDATA
-;		
-;		lea		Font,	a0		;	load graphics
-;		move.l  #$40000000,($C00004).l
-;		jsr     (nemdec_vram).l
-;		
-;		lea	  (LoadMap).l,a0	;	map
-;		lea     $FF0000.l,a4
-;		jsr     (nemdec).l
-;		
-;		copyTilemap	$FF0000,$C620,9,3
-;		
-;		move.b	#$01,	$FFE00A
-;		
-;		moveq	#60-1,	d7
-;		
-;	.loop:
-;		subi.b	#1,	d7
-;		jsr		$51CE
-;		jsr		$C8018
-;		dbf		d7,	.loop
+		lea		VDPCTRL,	A6
+	;	move.w	#$8000+%00000001,(A6)
+		move.w	#$8100+%01010100,(A6)
+		move.w	#$8200+(PLANE_A/$400),(A6)
+		move.w	#$8400+(PLANE_B/$2000),(A6)
+		move.l	#CRAMWRITE,	VDPCTRL
+		move.w	#$0000,	VDPDATA
+		move.w	#$00EE,	VDPDATA
+		move.w	#$00CE,	VDPDATA
+		move.w	#$008C,	VDPDATA
+		move.w	#$0004,	VDPDATA
+		
+		lea		Font,	a0		;	load graphics
+		move.l  #$40000000,($C00004).l
+		jsr     (nemdec_vram).l
+		
+		lea	  (LoadMap).l,a0	;	map
+		lea     $FF0000.l,a4
+		jsr     (nemdec).l
+		
+		copyTilemap	$FF0000,$C620,9,3
+		
+		move.b	#$01,	$FFE00A
+		
+		moveq	#60-1,	d7
+	;	move	#$2700,sr
+		
+	.vint:
+	;	bsr.s	VSync
+		dbf		d7,	.vint
 
 		move.w	#0,	$FFEA00				 ;	Move 0 to game mode RAM (i moved the level mode here)
 		jmp	$789E				           ;	Jump to level code
 											
-SHC:	incbin	"SHC_Advanced.bin"          ;	SHC screen include
+;SHC:	incbin	"SHC_Advanced.bin"          ;	SHC screen include
+
+;****************************************************************************
+; VSync
+; Waits until the next frame
+;****************************************************************************
+
+VSync:
+    lea     ($C00004),a6
+
+@Loop1:                             ; Wait until current VBlank is over
+    move.w    (a6),d7
+    btst.l    #3,d7
+    bne.s    @Loop1
+
+@Loop2:                             ; Wait until next VBlank starts
+    move.w    (a6),d7
+    btst.l    #3,d7
+    beq.s    @Loop2
+
+    rts                             ; End of subroutine
 
 ;	============================================================================!
 		align		$210000				 ;	CHUNK LOADING						!
