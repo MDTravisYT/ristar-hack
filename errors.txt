@@ -2,17 +2,8 @@
 SN 68k version 2.53
 
 C:\USERS\MINEC\DOWNLOADS\RISTAR_HACK\COMPILE.ASM(27) : Warning : Forward reference to redefinable symbol
-C:\USERS\MINEC\DOWNLOADS\RISTAR_HACK\COMPILE.ASM(30) : Warning : Forward reference to redefinable symbol
-C:\USERS\MINEC\DOWNLOADS\RISTAR_HACK\COMPILE.ASM(31) : Warning : Forward reference to redefinable symbol
-C:\USERS\MINEC\DOWNLOADS\RISTAR_HACK\COMPILE.ASM(32) : Warning : Forward reference to redefinable symbol
-C:\USERS\MINEC\DOWNLOADS\RISTAR_HACK\COMPILE.ASM(32) : Warning : Forward reference to redefinable symbol
-C:\USERS\MINEC\DOWNLOADS\RISTAR_HACK\COMPILE.ASM(33) : Warning : Forward reference to redefinable symbol
-C:\USERS\MINEC\DOWNLOADS\RISTAR_HACK\COMPILE.ASM(34) : Warning : Forward reference to redefinable symbol
-C:\USERS\MINEC\DOWNLOADS\RISTAR_HACK\COMPILE.ASM(35) : Warning : Forward reference to redefinable symbol
-C:\USERS\MINEC\DOWNLOADS\RISTAR_HACK\COMPILE.ASM(36) : Warning : Forward reference to redefinable symbol
-C:\USERS\MINEC\DOWNLOADS\RISTAR_HACK\COMPILE.ASM(37) : Warning : Forward reference to redefinable symbol
-C:\USERS\MINEC\DOWNLOADS\RISTAR_HACK\COMPILE.ASM(41) : Warning : Forward reference to redefinable symbol
-C:\USERS\MINEC\DOWNLOADS\RISTAR_HACK\COMPILE.ASM(45) : Warning : Forward reference to redefinable symbol
+C:\USERS\MINEC\DOWNLOADS\RISTAR_HACK\COMPILE.ASM(39) : Warning : Forward reference to redefinable symbol
+C:\USERS\MINEC\DOWNLOADS\RISTAR_HACK\COMPILE.ASM(43) : Warning : Forward reference to redefinable symbol
 
 Assembly completed.
-0 error(s) from 1880 lines in 0.2 seconds
+0 error(s) from 1948 lines in 0.2 seconds

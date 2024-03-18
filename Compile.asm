@@ -25,17 +25,15 @@ CustomGameMode:				             ;
 ;		jsr	SHC				             ;	Play SHC screen
 	
 		lea		VDPCTRL,	A6
-	;	move.w	#$8000+%00000001,(A6)
-		move.w	#$8100+%01010100,(A6)
-		move.w	#$8200+(PLANE_A/$400),(A6)
-		move.w	#$8400+(PLANE_B/$2000),(A6)
-		move.l	#CRAMWRITE,	VDPCTRL
-		move.w	#$0000,	VDPDATA
-		move.w	#$00EE,	VDPDATA
-		move.w	#$00CE,	VDPDATA
-		move.w	#$008C,	VDPDATA
-		move.w	#$0004,	VDPDATA
+;	;	move.w	#$8000+%00000001,(A6)
+;		move.w	#$8100+%01010100,(A6)
+;		move.w	#$8200+(PLANE_A/$400),(A6)
+;		move.w	#$8400+(PLANE_B/$2000),(A6)
+		move.l	#$000000EE,	$FFEF00
+		move.l	#$00CE008C,	$FFEF04
+		move.w	#$0004,	$FFEF08
 		
+		move	#$2700,	sr
 		lea		Font,	a0		;	load graphics
 		move.l  #$40000000,($C00004).l
 		jsr     (nemdec_vram).l
@@ -43,17 +41,19 @@ CustomGameMode:				             ;
 		lea	  (LoadMap).l,a0	;	map
 		lea     $FF0000.l,a4
 		jsr     (nemdec).l
+		move	#$2300,	sr
 		
 		copyTilemap	$FF0000,$C620,9,3
 		
-		move.b	#$01,	$FFE00A
+		moveq	#60-1,	d4
 		
-		moveq	#60-1,	d7
-	;	move	#$2700,sr
+		move.b	#$25,	$FFE00A
 		
 	.vint:
-	;	bsr.s	VSync
-		dbf		d7,	.vint
+		bsr.s	VSync
+	;	jsr		$C8018
+		dbf		d4,	.vint
+		jsr		Pal_FadeBlack
 
 		move.w	#0,	$FFEA00				 ;	Move 0 to game mode RAM (i moved the level mode here)
 		jmp	$789E				           ;	Jump to level code
@@ -79,6 +79,74 @@ VSync:
     beq.s    @Loop2
 
     rts                             ; End of subroutine
+
+; ---------------------------------------------------------------------------
+; Subroutine to fade a palette to black at the speed of d0
+; ---------------------------------------------------------------------------
+
+Pal_FadeBlack:						; Offset: 000006CC
+		clr.w	$FFFFEF00
+		moveq	#$15,d4
+
+PFB_FadeFrame:
+		bsr.s	VSync
+
+		bsr.s	PFB_FadeBuffer
+		dbf	d4,	PFB_FadeFrame
+
+PFB_NotFinished:					; Offset: 000006FC
+		rts						; return
+
+; ---------------------------------------------------------------------------
+; Subroutine to fade a buffer's colours to black once
+; ---------------------------------------------------------------------------
+
+PFB_FadeBuffer:							; Offset: 000006FE
+		lea	($FFFFEF00).w,a0			; load palette buffer address
+		move.w	#$0040,d0				; set repeat times
+	;	adda.w	d0,a0
+	;	subq.w	#$01,d0					; subtract 1 (most likely for the dbf instruction)
+
+PFB_NextColour:						; Offset: 00000708
+	;	move.w	d2,d0					; copy colour to d0
+		bsr.s	PFB_DecreaseColour			; process red
+		dbf	d0,PFB_NextColour			; repeat til all colours processed
+		rts						; return
+
+; ---------------------------------------------------------------------------
+; Subroutine to decrease a single colour nybble
+; ---------------------------------------------------------------------------
+
+PFB_DecreaseColour:					; Offset: 0000072C
+dered:
+		move.w	(a0),d2
+		beq.s	next
+		move.w	d2,d1
+		andi.w	#$E,d1
+		beq.s	degreen
+		subq.w	#2,(a0)+	; decrease red value
+		rts	
+; ===========================================================================
+
+degreen:
+		move.w	d2,d1
+		andi.w	#$E0,d1
+		beq.s	deblue
+		subi.w	#$20,(a0)+	; decrease green value
+		rts	
+; ===========================================================================
+
+deblue:
+		move.w	d2,d1
+		andi.w	#$E00,d1
+		beq.s	next
+		subi.w	#$200,(a0)+	; decrease blue	value
+		rts	
+; ===========================================================================
+
+next:
+		addq.w	#2,a0
+		rts						; return
 
 ;	============================================================================!
 		align		$210000				 ;	CHUNK LOADING						!
