@@ -4,6 +4,15 @@ align    macro
     cnop 0,\1
     endm
 
+
+copyTilemap:	macro source,loc,width,height
+		lea	(source).l,a1
+		move.l	#$40000000+((loc&$3FFF)<<16)+((loc&$C000)>>14),d0
+		moveq	#width,d1
+		moveq	#height,d2
+		jsr		DrawTileMap
+		endm
+
 		incbin     "ristar.j - Copy.bin"	;	Include hex edited Ristar ROM
 											;		to jump to custom code
 											
@@ -12,10 +21,41 @@ align    macro
 ;	============================================================================!
 											
 CustomGameMode:				             ;	
-
-		move.b	#$25,	$FFE00A
 		
 		jsr	SHC				             ;	Play SHC screen
+	
+;		lea		VDPCTRL,	A6
+;	;	move.w	#$8000+%00000001,(A6)
+;		move.w	#$8100+%01010100,(A6)
+;		move.w	#$8200+(PLANE_A/$400),(A6)
+;		move.w	#$8400+(PLANE_B/$2000),(A6)
+;		move.l	#CRAMWRITE,	VDPCTRL
+;		move.w	#$0000,	VDPDATA
+;		move.w	#$00EE,	VDPDATA
+;		move.w	#$00CE,	VDPDATA
+;		move.w	#$008C,	VDPDATA
+;		move.w	#$0004,	VDPDATA
+;		
+;		lea		Font,	a0		;	load graphics
+;		move.l  #$40000000,($C00004).l
+;		jsr     (nemdec_vram).l
+;		
+;		lea	  (LoadMap).l,a0	;	map
+;		lea     $FF0000.l,a4
+;		jsr     (nemdec).l
+;		
+;		copyTilemap	$FF0000,$C620,9,3
+;		
+;		move.b	#$01,	$FFE00A
+;		
+;		moveq	#60-1,	d7
+;		
+;	.loop:
+;		subi.b	#1,	d7
+;		jsr		$51CE
+;		jsr		$C8018
+;		dbf		d7,	.loop
+
 		move.w	#0,	$FFEA00				 ;	Move 0 to game mode RAM (i moved the level mode here)
 		jmp	$789E				           ;	Jump to level code
 											
@@ -34,7 +74,7 @@ sub_87EA:				               ; CODE XREF: sub_7B32+492↑p
 
 		;		move.b  $FFE500,d0		;	level art
 		;		jsr     $13B06
-				
+
 				move.b  $FFE500,d0		;	level palette
 				jsr     $13D0E
 				lea     (ChunkPointers).l,a1
@@ -158,6 +198,18 @@ Indexes:incbin	"SonLVL/index.nem"
 		align		$230000				 ;	LAYOUT DATA							!
 ;	============================================================================!  
 		incbin	"SonLVL/map.bin"
+		
+;	============================================================================!
+		align		$238000				 ;	MUSIC DATA							!
+;	============================================================================!  
+
+dkick	=	$81
+dsnare	=	$87
+dhitom	=	$82
+dmidtom	=	$82
+dlowtom	=	$82
+		include		"_smps2asm_inc.asm"
+		include		"Marble Zone Act 1.asm"
 				
 ;	============================================================================!
 		align		$300000				 ;	LOADING SCREEN						!
@@ -168,14 +220,6 @@ PLANE_B		=	$E000
 VDPDATA		=	$C00000
 VDPCTRL		=	$C00004
 CRAMWRITE:	=	$C0000000
-
-copyTilemap:	macro source,loc,width,height
-		lea	(source).l,a1
-		move.l	#$40000000+((loc&$3FFF)<<16)+((loc&$C000)>>14),d0
-		moveq	#width,d1
-		moveq	#height,d2
-		bsr.w	DrawTileMap
-		endm
 
 LoadScreen:
 				move.b  (a5)+,$11(a3)
