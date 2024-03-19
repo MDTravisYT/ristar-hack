@@ -6,4 +6,4 @@ C:\USERS\MINEC\DOWNLOADS\RISTAR_HACK\COMPILE.ASM(42) : Warning : Forward referen
 C:\USERS\MINEC\DOWNLOADS\RISTAR_HACK\COMPILE.ASM(46) : Warning : Forward reference to redefinable symbol
 
 Assembly completed.
-0 error(s) from 2023 lines in 0.1 seconds
+0 error(s) from 2023 lines in 0.2 seconds
