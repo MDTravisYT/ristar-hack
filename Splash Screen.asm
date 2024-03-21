@@ -4,13 +4,14 @@
 ;                                                                               !
 ;	============================================================================!
 
+	;	▼ Load palette ▼
 		lea		MDTPal,		a0				;	Load palette address into a0
 		lea		$FFEF00,	a1				;	Load address it'll be printed at
 		rept	32							;	Prepare the compiler loop!
 		move.l	(a0)+,		(a1)+			;	This line is repeated 32 times in the ROM.
 		endr								;	Stop the compiler loop.
 
-	;	Loads Nemesis archives
+	;	▼ Load Nemesis archives ▼
 		move	#$2700,		sr				;	Disable interrupts
 		lea		MDTArt,		a0				;	Load MDT splash art address...
 		move.l	#$40000001,	($C00004).l		;	...to VRAM
@@ -22,7 +23,7 @@
 		
 		copyTilemap	$FF0000,$C206,$21,$15	;	Copy loaded tilemap into plane
 		
-	;	Main screen routine
+	;	▼ Main screen routine ▼
 		moveq	#60-1,		d4				;	Set main timer to d4
 		move.b	#$25,		$FFE00A			;	Play sound effect
 	.vint:									;	                 ...here! ◄──────┐
@@ -30,7 +31,7 @@
 		dbf		d4,			.vint			;	Decrement timer, jump back to... ┘ (Ignored if d4 is 0)
 		jsr		Pal_FadeBlack				;	Fade screen to black
 	
-	;	Go to level mode
+	;	▼ Go to level mode ▼
 		move.w	#0,			$FFEA00			;	Opmode is now 0, which I moved the level mode to
 		jmp	$789E							;	Jump to the level code, fully activating the level mode
 
@@ -39,6 +40,22 @@
 ;	BELOW IS CODE BORROWED FROM EXTERNAL SOURCES!                               !
 ;                                                                               !
 ;	============================================================================!
+
+;	KatKuriN - Custom
+DrawTileMap:		;	SUBROUTINE
+                lea     VDPDATA,a6
+                move.l  #$800000,d4
+
+.LoopRow:                           
+                move.l  d0,4(a6)    ; VDPCTRL
+                move.w  d1,d3
+
+.LoopColumn: 
+                move.w  (a1)+,(a6)
+                dbf     d3,.LoopColumn
+                add.l   d4,d0
+                dbf     d2,.LoopRow
+                rts
 
 ;	ProjectFM - Alien Shooty Game
 ;****************************************************************************
