@@ -38,5 +38,5 @@ LoadScreen:
 		
 		jmp		$300						;	Jump back to main routine
 				
-Font:		incbin	"Font.nem"
-LoadMap:	incbin	"LoadMap.nem"
+Font:		incbin	"Load Screen/LoadArt.nem"
+LoadMap:	incbin	"Load Screen/LoadMap.nem"

@@ -3,13 +3,13 @@
 		include		"Constants.asm"
 		include		"Macros.asm"
 
-		incbin     "ristar.j - Copy.bin"	;	Include hex edited Ristar ROM
-											;		to jump to custom code
+		incbin		"HexStar.bin"	;	Include hex edited Ristar ROM to jump to custom code
+
 ;	============================================================================!
 		align		$200000				 ;	SPLASH								!
 ;	============================================================================!
 											
-		include		"Splash Screen.asm"
+		include		"Splash Screen/Main.asm"
 
 ;	============================================================================!
 		align		$210000				 ;	CHUNK LOADING						!
@@ -27,21 +27,21 @@
 		align		$220000				 ;	CHUNK DATA							!
 ;	============================================================================!  
 		
-		incbin	"SonLVL/chunks.nem"
+		incbin		"Levels/Compressed/Chunks.nem"
 		
 ;	============================================================================!
 		align		$228000				 ;	BLOCK DATA							!
 ;	============================================================================!  
 
-		incbin	"SonLVL/blocks.nem"
-ArtMZ:	incbin	"SonLVL/ArtMZ.bin"
-Indexes:incbin	"SonLVL/index.nem"	;	Collision index
+		incbin		"Levels/Compressed/Blocks.nem"
+ArtMZ:	incbin		"Levels/Art.bin"
+Indexes:incbin		"Levels/Compressed/Collision.nem"	;	Collision index
 
 ;	============================================================================!
 		align		$230000				 ;	LAYOUT DATA							!
 ;	============================================================================!  
 
-		incbin	"SonLVL/map.bin"	;	Level layout
+		incbin		"Levels/Layout.bin"	;	Level layout
 		
 ;	============================================================================!
 		align		$238000				 ;	MUSIC DATA							!
@@ -52,11 +52,11 @@ dsnare	=	$87
 dhitom	=	$82
 dmidtom	=	$82
 dlowtom	=	$82
-		include		"_smps2asm_inc.asm"
-		include		"Marble Zone Act 1.asm"
+		include		"Sound/_smps2asm_inc.asm"
+		include		"Sound/Music.asm"
 				
 ;	============================================================================!
 		align		$300000				 ;	LOADING SCREEN						!
 ;	============================================================================! 
 
-		include		"Loading Screen.asm"
+		include		"Load Screen/Main.asm"

@@ -49,13 +49,13 @@
 00000000                            		endm
 00000000                            		endm
 00000000                            
-00000000                            		incbin     "ristar.j - Copy.bin"	;	Include hex edited Ristar ROM
-00200000                            											;		to jump to custom code
+00000000                            		incbin		"HexStar.bin"	;	Include hex edited Ristar ROM to jump to custom code
+00200000                            
 00200000                            ;	============================================================================!
 00200000                            		align		$200000				 ;	SPLASH								!
 00200000                            ;	============================================================================!
 00200000                            											
-00200000                            		include		"Splash Screen.asm"
+00200000                            		include		"Splash Screen/Main.asm"
 00200000                            ;	============================================================================!
 00200000                            ;                                                                               !
 00200000                            ;	MDT Splash Screen															!
@@ -213,12 +213,12 @@
 00200144                            ;	============================================================================!
 00200144                            
 00200144                            		even
-00200144                            MDTPal:	incbin	"Splash Final.bin"			;	Palette
+00200144                            MDTPal:	incbin	"Splash Screen/MDT Splash Palette.pal"			;	Palette
 002001C4                            		even
-002001C4                            MDTMap:	incbin	"MDT Splash Map.nem"		;	Tilemap
+002001C4                            MDTMap:	incbin	"Splash Screen/MDT Splash Map.nem"		;	Tilemap
 00200290 00                         		even
-00200290                            MDTArt:	incbin	"MDT Splash.nem"			;	Art
-00200290                            MDTArt:	incbin	"MDT Splash.nem"			;	Art
+00200290                            MDTArt:	incbin	"Splash Screen/MDT Splash Art.nem"			;	Art
+00200290                            MDTArt:	incbin	"Splash Screen/MDT Splash Art.nem"			;	Art
 002004F5                            
 002004F5                            ;	============================================================================!
 002004F5                            		align		$210000				 ;	CHUNK LOADING						!
@@ -302,21 +302,21 @@
 0021204E                            		align		$220000				 ;	CHUNK DATA							!
 00220000                            ;	============================================================================!  
 00220000                            		
-00220000                            		incbin	"SonLVL/chunks.nem"
+00220000                            		incbin		"Levels/Compressed/Chunks.nem"
 00223671                            		
 00223671                            ;	============================================================================!
 00223671                            		align		$228000				 ;	BLOCK DATA							!
 00228000                            ;	============================================================================!  
 00228000                            
-00228000                            		incbin	"SonLVL/blocks.nem"
-00228676                            ArtMZ:	incbin	"SonLVL/ArtMZ.bin"
-0022ADFC                            Indexes:incbin	"SonLVL/index.nem"	;	Collision index
+00228000                            		incbin		"Levels/Compressed/Blocks.nem"
+00228676                            ArtMZ:	incbin		"Levels/Art.bin"
+0022ADFC                            Indexes:incbin		"Levels/Compressed/Collision.nem"	;	Collision index
 0022AE7E                            
 0022AE7E                            ;	============================================================================!
 0022AE7E                            		align		$230000				 ;	LAYOUT DATA							!
 00230000                            ;	============================================================================!  
 00230000                            
-00230000                            		incbin	"SonLVL/map.bin"	;	Level layout
+00230000                            		incbin		"Levels/Layout.bin"	;	Level layout
 0023009E                            		
 0023009E                            ;	============================================================================!
 0023009E                            		align		$238000				 ;	MUSIC DATA							!
@@ -327,7 +327,7 @@
 00238000 =00000082                  dhitom	=	$82
 00238000 =00000082                  dmidtom	=	$82
 00238000 =00000082                  dlowtom	=	$82
-00238000                            		include		"_smps2asm_inc.asm"
+00238000                            		include		"Sound/_smps2asm_inc.asm"
 00238000                            ; =============================================================================================
 00238000                            ; Created by Flamewing, based on S1SMPS2ASM version 1.1 by Marc Gordon (AKA Cinossu)
 00238000                            
@@ -1017,7 +1017,7 @@
 00238000                            	endm
 00238000                            
 00238000                            
-00238000                            		include		"Marble Zone Act 1.asm"
+00238000                            		include		"Sound/Music.asm"
 00238000                            Mus83_MZ_Header:
 00238000 0000                       	smpsHeaderVoice     Mus83_MZ_Voices
 00238002 0703                       	smpsHeaderChan      $07, $03
@@ -1347,7 +1347,7 @@
 002385C5                            		align		$300000				 ;	LOADING SCREEN						!
 00300000                            ;	============================================================================! 
 00300000                            
-00300000                            		include		"Loading Screen.asm"
+00300000                            		include		"Load Screen/Main.asm"
 00300000                            ;	============================================================================!
 00300000                            ;                                                                               !
 00300000                            ;	Loading Screen:																!
@@ -1388,6 +1388,6 @@
 00300092                            		
 00300092 4EF9 0000 0300             		jmp		$300						;	Jump back to main routine
 00300098                            				
-00300098                            Font:		incbin	"Font.nem"
-003001AC                            LoadMap:	incbin	"LoadMap.nem"
-003001AC                            LoadMap:	incbin	"LoadMap.nem"
+00300098                            Font:		incbin	"Load Screen/LoadArt.nem"
+003001AC                            LoadMap:	incbin	"Load Screen/LoadMap.nem"
+003001AC                            LoadMap:	incbin	"Load Screen/LoadMap.nem"

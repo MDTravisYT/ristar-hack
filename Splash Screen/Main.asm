@@ -155,8 +155,8 @@ next:
 ;	============================================================================!
 
 		even
-MDTPal:	incbin	"Splash Final.bin"			;	Palette
+MDTPal:	incbin	"Splash Screen/MDT Splash Palette.pal"			;	Palette
 		even
-MDTMap:	incbin	"MDT Splash Map.nem"		;	Tilemap
+MDTMap:	incbin	"Splash Screen/MDT Splash Map.nem"		;	Tilemap
 		even
-MDTArt:	incbin	"MDT Splash.nem"			;	Art
+MDTArt:	incbin	"Splash Screen/MDT Splash Art.nem"			;	Art
