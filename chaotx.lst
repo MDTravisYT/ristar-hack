@@ -1,180 +1,209 @@
 00000000                            ;	TO ADD CODE:	4E F9 (ADDRESS LONGWORD)
 00000000                            
-00000000                            align    macro
-00000000                                cnop 0,\1
-00000000                                endm
+00000000                            		include		"Constants.asm"
+00000000 =00163716                  ChunkPointers	=	$163716
+00000000 =00004C3E                  stardec			=	$4C3E
+00000000 =000049A8                  nemdec			=	$49A8
+00000000 =00004996                  nemdec_vram		=	$4996
+00000000 =00004996                  nemdec_vram		=	$4996
+00000000                            		include		"Macros.asm"
+00000000                            ;	============================================================================!
+00000000                            ;																				!
+00000000                            ;		align:																	!
+00000000                            ;			Aligns the following data to the specified ROM location.			!
+00000000                            ;			Make sure your data isn't too big!									!
+00000000                            ;																				!
+00000000                            ;		USAGE:		align	(address)											!
+00000000                            ;		EXAMPLE:	align	$200000												!
+00000000                            ;																				!
+00000000                            ;	============================================================================!
 00000000                            
+00000000                            align	macro
+00000000                            		cnop 0,\1
+00000000                            		endm
 00000000                            
-00000000                            copyTilemap:	macro source,loc,width,height
-00000000                            		lea	(source).l,a1
+00000000                            ;	============================================================================!
+00000000                            ;																				!
+00000000                            ;		copyTilemap:	Taken from the Sonic 1 disassembly at Sonic Retro		!
+00000000                            ;			An easy to use tilemap setup.										!
+00000000                            ;																				!
+00000000                            ;		USAGE:		copyTilemap		(source),(location),(width),(height)		!
+00000000                            ;		EXAMPLE:	copyTilemap		$FF0000,$C206,$21,$15						;
+00000000                            ;																				!
+00000000                            ;	============================================================================!
+00000000                            
+00000000                            copyTilemap:	macro	source,loc,width,height
+00000000                            		lea		(source).l,a1
 00000000                            		move.l	#$40000000+((loc&$3FFF)<<16)+((loc&$C000)>>14),d0
 00000000                            		moveq	#width,d1
 00000000                            		moveq	#height,d2
 00000000                            		jsr		DrawTileMap
 00000000                            		endm
+00000000                            		endm
 00000000                            
 00000000                            		incbin     "ristar.j - Copy.bin"	;	Include hex edited Ristar ROM
 00200000                            											;		to jump to custom code
-00200000                            											
 00200000                            ;	============================================================================!
-00200000                            		align		$200000				 ;	SHC SPLASH							!
+00200000                            		align		$200000				 ;	SPLASH								!
 00200000                            ;	============================================================================!
 00200000                            											
-00200000                            CustomGameMode:				             ;	
-00200000                            		
-00200000                            ;		jsr	SHC				             ;	Play SHC screen
-00200000                            	
-00200000 4DF9 0000 0000             		lea		VDPCTRL,	A6
-00200006                            ;	;	move.w	#$8000+%00000001,(A6)
-00200006                            ;		move.w	#$8100+%01010100,(A6)
-00200006                            ;		move.w	#$8200+(PLANE_A/$400),(A6)
-00200006                            ;		move.w	#$8400+(PLANE_B/$2000),(A6)
-00200006 41F9 0000 0000             		lea		MDTPal,		a0
-0020000C 43F9 00FF EF00             		lea		$FFEF00,	a1
-00200012                            		rept	32
-00200012                            			move.l	(a0)+,(a1)+
-00200012 22D8 22D8 22D8 22D8 22D8+  		endr
-00200052                            
-00200052                            		
-00200052 46FC 2700                  		move	#$2700,	sr
-00200056 41F9 0000 0000             		lea		MDTArt,	a0		;	load graphics
-0020005C 23FC 4000 0001 00C0 0004   		move.l  #$40000001,($C00004).l
-00200066 4EB9 0000 0000             		jsr     (nemdec_vram).l
-0020006C                            		
-0020006C 41F9 0000 0000             		lea	  (MDTMap).l,a0	;	map
-00200072 49F9 00FF 0000             		lea     $FF0000.l,a4
-00200078 4EB9 0000 0000             		jsr     (nemdec).l
-0020007E 46FC 2300                  		move	#$2300,	sr
-00200082                            		
-00200082 43F9 00FF 0000 203C 4206+  		copyTilemap	$FF0000,$C206,$21,$15
-00200098                            		
-00200098 783B                       		moveq	#60-1,	d4
-0020009A                            		
-0020009A 13FC 0025 00FF E00A        		move.b	#$25,	$FFE00A
-002000A2                            		
-002000A2                            	.vint:
-002000A2 4EB9 0000 0000             		jsr		VSync
-002000A8                            	;	jsr		$C8018
-002000A8 51CC FFF8                  		dbf		d4,	.vint
-002000AC 4EB9 0000 0000             		jsr		Pal_FadeBlack
-002000B2                            
-002000B2 33FC 0000 00FF EA00        		move.w	#0,	$FFEA00				 ;	Move 0 to game mode RAM (i moved the level mode here)
-002000BA 4EF9 0000 789E             		jmp	$789E				           ;	Jump to level code
-002000C0                            											
-002000C0                            ;SHC:	incbin	"SHC_Advanced.bin"          ;	SHC screen include
+00200000                            		include		"Splash Screen.asm"
+00200000                            ;	============================================================================!
+00200000                            ;                                                                               !
+00200000                            ;	MDT Splash Screen															!
+00200000                            ;                                                                               !
+00200000                            ;	============================================================================!
+00200000                            
+00200000 41F9 0000 0000             		lea		MDTPal,		a0				;	Load palette address into a0
+00200006 43F9 00FF EF00             		lea		$FFEF00,	a1				;	Load address it'll be printed at
+0020000C                            		rept	32							;	Prepare the compiler loop!
+0020000C                            		move.l	(a0)+,		(a1)+			;	This line is repeated 32 times in the ROM.
+0020000C 22D8 22D8 22D8 22D8 22D8+  		endr								;	Stop the compiler loop.
+0020004C                            
+0020004C                            	;	Loads Nemesis archives
+0020004C 46FC 2700                  		move	#$2700,		sr				;	Disable interrupts
+00200050 41F9 0000 0000             		lea		MDTArt,		a0				;	Load MDT splash art address...
+00200056 23FC 4000 0001 00C0 0004   		move.l	#$40000001,	($C00004).l		;	...to VRAM
+00200060 4EB9 0000 4996             		jsr		(nemdec_vram).l				;	Call VRAM Nemesis decompress
+00200066 41F9 0000 0000             		lea		(MDTMap).l,	a0				;	Load MDT splash tilemap...
+0020006C 49F9 00FF 0000             		lea		$FF0000.l,	a4				;	...to $FF0000 (RAM)
+00200072 4EB9 0000 49A8             		jsr		(nemdec).l					;	Call RAM Nemesis decompress
+00200078 46FC 2300                  		move	#$2300,		sr				;	Enable interrupts
+0020007C                            		
+0020007C 43F9 00FF 0000 203C 4206+  		copyTilemap	$FF0000,$C206,$21,$15	;	Copy loaded tilemap into plane
+00200092                            		
+00200092                            	;	Main screen routine
+00200092 783B                       		moveq	#60-1,		d4				;	Set main timer to d4
+00200094 13FC 0025 00FF E00A        		move.b	#$25,		$FFE00A			;	Play sound effect
+0020009C                            	.vint:									;	                 ...here! ◄──────┐
+0020009C 4EB9 0000 0000             		jsr		VSync						;	Wait for VSync                   │
+002000A2 51CC FFF8                  		dbf		d4,			.vint			;	Decrement timer, jump back to... ┘ (Ignored if d4 is 0)
+002000A6 4EB9 0000 0000             		jsr		Pal_FadeBlack				;	Fade screen to black
+002000AC                            	
+002000AC                            	;	Go to level mode
+002000AC 33FC 0000 00FF EA00        		move.w	#0,			$FFEA00			;	Opmode is now 0, which I moved the level mode to
+002000B4 4EF9 0000 789E             		jmp	$789E							;	Jump to the level code, fully activating the level mode
+002000BA                            
+002000BA                            ;	============================================================================!
+002000BA                            ;                                                                               !
+002000BA                            ;	BELOW IS CODE BORROWED FROM EXTERNAL SOURCES!                               !
+002000BA                            ;                                                                               !
+002000BA                            ;	============================================================================!
+002000BA                            
+002000BA                            ;	ProjectFM - Alien Shooty Game
+002000BA                            ;****************************************************************************
+002000BA                            ; VSync
+002000BA                            ; Waits until the next frame
+002000BA                            ;****************************************************************************
+002000BA                            
+002000BA                            VSync:
+002000BA 4DF9 00C0 0004                 lea     ($C00004),a6
 002000C0                            
-002000C0                            MDTPal:	incbin	"Splash Final.bin"
-00200140                            
-00200140                            ;****************************************************************************
-00200140                            ; VSync
-00200140                            ; Waits until the next frame
-00200140                            ;****************************************************************************
-00200140                            
-00200140                            VSync:
-00200140 4DF9 00C0 0004                 lea     ($C00004),a6
-00200146                            
-00200146                            @Loop1:                             ; Wait until current VBlank is over
-00200146 3E16                           move.w    (a6),d7
-00200148 0807 0003                      btst.l    #3,d7
-0020014C 66F8                           bne.s    @Loop1
-0020014E                            
-0020014E                            @Loop2:                             ; Wait until next VBlank starts
-0020014E 3E16                           move.w    (a6),d7
-00200150 0807 0003                      btst.l    #3,d7
-00200154 67F8                           beq.s    @Loop2
-00200156                            
-00200156 4E75                           rts                             ; End of subroutine
-00200158                            
-00200158                            ; ---------------------------------------------------------------------------
-00200158                            ; Subroutine to fade a palette to black at the speed of d0
-00200158                            ; ---------------------------------------------------------------------------
-00200158                            
-00200158                            Pal_FadeBlack:						; Offset: 000006CC
-00200158 4279 FFFF EF00             		clr.w	$FFFFEF00
-0020015E 7815                       		moveq	#$15,d4
-00200160                            
-00200160                            PFB_FadeFrame:
-00200160 61DE                       		bsr.s	VSync
-00200162                            
-00200162 6100                       		bsr.s	PFB_FadeBuffer
-00200164 51CC FFFA                  		dbf	d4,	PFB_FadeFrame
-00200168                            
-00200168                            PFB_NotFinished:					; Offset: 000006FC
-00200168 4E75                       		rts						; return
-0020016A                            
-0020016A                            ; ---------------------------------------------------------------------------
-0020016A                            ; Subroutine to fade a buffer's colours to black once
-0020016A                            ; ---------------------------------------------------------------------------
-0020016A                            
-0020016A                            PFB_FadeBuffer:							; Offset: 000006FE
-0020016A 41F8 EF00                  		lea	($FFFFEF00).w,a0			; load palette buffer address
-0020016E 303C 0040                  		move.w	#$0040,d0				; set repeat times
-00200172                            	;	adda.w	d0,a0
-00200172                            	;	subq.w	#$01,d0					; subtract 1 (most likely for the dbf instruction)
-00200172                            
-00200172                            PFB_NextColour:						; Offset: 00000708
-00200172                            	;	move.w	d2,d0					; copy colour to d0
-00200172 6100                       		bsr.s	PFB_DecreaseColour			; process red
-00200174 51C8 FFFC                  		dbf	d0,PFB_NextColour			; repeat til all colours processed
-00200178 4E75                       		rts						; return
-0020017A                            
-0020017A                            ; ---------------------------------------------------------------------------
-0020017A                            ; Subroutine to decrease a single colour nybble
-0020017A                            ; ---------------------------------------------------------------------------
-0020017A                            
-0020017A                            PFB_DecreaseColour:					; Offset: 0000072C
-0020017A                            dered:
-0020017A 3410                       		move.w	(a0),d2
-0020017C 6700                       		beq.s	next
-0020017E 3202                       		move.w	d2,d1
-00200180 0241 000E                  		andi.w	#$E,d1
-00200184 6700                       		beq.s	degreen
-00200186 5558                       		subq.w	#2,(a0)+	; decrease red value
-00200188 4E75                       		rts	
-0020018A                            ; ===========================================================================
-0020018A                            
-0020018A                            degreen:
-0020018A 3202                       		move.w	d2,d1
-0020018C 0241 00E0                  		andi.w	#$E0,d1
-00200190 6700                       		beq.s	deblue
-00200192 0458 0020                  		subi.w	#$20,(a0)+	; decrease green value
-00200196 4E75                       		rts	
-00200198                            ; ===========================================================================
-00200198                            
-00200198                            deblue:
-00200198 3202                       		move.w	d2,d1
-0020019A 0241 0E00                  		andi.w	#$E00,d1
-0020019E 6700                       		beq.s	next
-002001A0 0458 0200                  		subi.w	#$200,(a0)+	; decrease blue	value
-002001A4 4E75                       		rts	
-002001A6                            ; ===========================================================================
-002001A6                            
-002001A6                            next:
-002001A6 5448                       		addq.w	#2,a0
-002001A8 4E75                       		rts						; return
-002001AA                            
-002001AA                            		even
-002001AA                            
-002001AA                            MDTMap:	incbin	"MDT Splash Map.nem"
-00200276 00                         		even
-00200276                            MDTArt:	incbin	"MDT Splash.nem"
-002004DB                            
-002004DB                            ;	============================================================================!
-002004DB                            		align		$210000				 ;	CHUNK LOADING						!
+002000C0                            @Loop1:                             ; Wait until current VBlank is over
+002000C0 3E16                           move.w    (a6),d7
+002000C2 0807 0003                      btst.l    #3,d7
+002000C6 66F8                           bne.s    @Loop1
+002000C8                            
+002000C8                            @Loop2:                             ; Wait until next VBlank starts
+002000C8 3E16                           move.w    (a6),d7
+002000CA 0807 0003                      btst.l    #3,d7
+002000CE 67F8                           beq.s    @Loop2
+002000D0                            
+002000D0 4E75                           rts                             ; End of subroutine
+002000D2                            
+002000D2                            ;	Yuji Naka(?) - Palette Fade Out (Sonic 1)
+002000D2                            ;	Disassembly from Sonic Retro
+002000D2                            ; ---------------------------------------------------------------------------
+002000D2                            ; Subroutine to fade a palette to black at the speed of d0
+002000D2                            ; ---------------------------------------------------------------------------
+002000D2                            
+002000D2                            Pal_FadeBlack:						; Offset: 000006CC
+002000D2 4279 FFFF EF00             		clr.w	$FFFFEF00
+002000D8 7815                       		moveq	#$15,d4
+002000DA                            
+002000DA                            PFB_FadeFrame:
+002000DA 61DE                       		bsr.s	VSync
+002000DC                            
+002000DC 6100                       		bsr.s	PFB_FadeBuffer
+002000DE 51CC FFFA                  		dbf	d4,	PFB_FadeFrame
+002000E2                            
+002000E2                            PFB_NotFinished:					; Offset: 000006FC
+002000E2 4E75                       		rts						; return
+002000E4                            
+002000E4                            ; ---------------------------------------------------------------------------
+002000E4                            ; Subroutine to fade a buffer's colours to black once
+002000E4                            ; ---------------------------------------------------------------------------
+002000E4                            
+002000E4                            PFB_FadeBuffer:							; Offset: 000006FE
+002000E4 41F8 EF00                  		lea	($FFFFEF00).w,a0			; load palette buffer address
+002000E8 303C 0040                  		move.w	#$0040,d0				; set repeat times
+002000EC                            	;	adda.w	d0,a0
+002000EC                            	;	subq.w	#$01,d0					; subtract 1 (most likely for the dbf instruction)
+002000EC                            
+002000EC                            PFB_NextColour:						; Offset: 00000708
+002000EC                            	;	move.w	d2,d0					; copy colour to d0
+002000EC 6100                       		bsr.s	PFB_DecreaseColour			; process red
+002000EE 51C8 FFFC                  		dbf	d0,PFB_NextColour			; repeat til all colours processed
+002000F2 4E75                       		rts						; return
+002000F4                            
+002000F4                            ; ---------------------------------------------------------------------------
+002000F4                            ; Subroutine to decrease a single colour nybble
+002000F4                            ; ---------------------------------------------------------------------------
+002000F4                            
+002000F4                            PFB_DecreaseColour:					; Offset: 0000072C
+002000F4                            dered:
+002000F4 3410                       		move.w	(a0),d2
+002000F6 6700                       		beq.s	next
+002000F8 3202                       		move.w	d2,d1
+002000FA 0241 000E                  		andi.w	#$E,d1
+002000FE 6700                       		beq.s	degreen
+00200100 5558                       		subq.w	#2,(a0)+	; decrease red value
+00200102 4E75                       		rts	
+00200104                            ; ===========================================================================
+00200104                            
+00200104                            degreen:
+00200104 3202                       		move.w	d2,d1
+00200106 0241 00E0                  		andi.w	#$E0,d1
+0020010A 6700                       		beq.s	deblue
+0020010C 0458 0020                  		subi.w	#$20,(a0)+	; decrease green value
+00200110 4E75                       		rts	
+00200112                            ; ===========================================================================
+00200112                            
+00200112                            deblue:
+00200112 3202                       		move.w	d2,d1
+00200114 0241 0E00                  		andi.w	#$E00,d1
+00200118 6700                       		beq.s	next
+0020011A 0458 0200                  		subi.w	#$200,(a0)+	; decrease blue	value
+0020011E 4E75                       		rts	
+00200120                            ; ===========================================================================
+00200120                            
+00200120                            next:
+00200120 5448                       		addq.w	#2,a0
+00200122 4E75                       		rts						; return
+00200124                            
+00200124                            ;	============================================================================!
+00200124                            ;                                                                               !
+00200124                            ;	Non-code data for splash screen												!
+00200124                            ;                                                                               !
+00200124                            ;	============================================================================!
+00200124                            
+00200124                            		even
+00200124                            MDTPal:	incbin	"Splash Final.bin"			;	Palette
+002001A4                            		even
+002001A4                            MDTMap:	incbin	"MDT Splash Map.nem"		;	Tilemap
+00200270 00                         		even
+00200270                            MDTArt:	incbin	"MDT Splash.nem"			;	Art
+00200270                            MDTArt:	incbin	"MDT Splash.nem"			;	Art
+002004D5                            
+002004D5                            ;	============================================================================!
+002004D5                            		align		$210000				 ;	CHUNK LOADING						!
 00210000                            ;	============================================================================!        
 00210000                            
-00210000 =00163716                  ChunkPointers	=	$163716
-00210000 =00004C3E                  stardec	=	$4C3E
-00210000 =000049A8                  nemdec			=	$49A8
-00210000 =00004996                  nemdec_vram		=	$4996
-00210000                            
+00210000                            		include		"Injection 000087EA - Chunk Loading.asm"
 00210000                            sub_87EA:				               ; CODE XREF: sub_7B32+492↑p
 00210000                            
-00210000                            		;		move.b  $FFE500,d0		;	level art
-00210000                            		;		jsr     $13B06
-00210000                            
-00210000 1039 00FF E500             				move.b  $FFE500,d0		;	level palette
-00210006 4EB9 0001 3D0E             				jsr     $13D0E
+00210000 1039 00FF E500             				move.b  $FFE500,d0
+00210006 4EB9 0001 3D0E             				jsr     $13D0E			;	Load level palette
 0021000C 43F9 0016 3716             				lea     (ChunkPointers).l,a1
 00210012 7000                       				moveq   #0,d0
 00210014 1039 00FF E500             				move.b  $FFE500,d0
@@ -192,58 +221,24 @@
 00210044 45F9 00FF A400             				lea     $FFA400,a2
 0021004A 4EB9 0001 3DB6             				jsr     $13DB6
 00210050 4EB9 0001 3A0E             				jsr     $13A0E
-00210056 41F9 0000 0000             				lea		ArtMZ,	a0
+00210056                            				
+00210056 41F9 0000 0000             				lea		ArtMZ,	a0		;	Load art
 0021005C 23FC 6400 0000 00C0 0004   				move.l  #$64000000,($C00004).l
 00210066 4EB9 0000 4996             				jsr     (nemdec_vram).l
-0021006C 1039 00FF E500             				move.b  $FFE500,d0		;	level display?
-00210072 4EB9 0000 0000             				jsr     sub_13A68
+0021006C                            				
+0021006C 1039 00FF E500             				move.b  $FFE500,d0		;	Load 16x16 tiles
+00210072 4EB9 0000 0000             				jsr     sub_13A68		
 00210078                            				
-00210078 41F9 0000 0000             				lea	  (Indexes).l,a0	;	collision indexes
+00210078 41F9 0000 0000             				lea	  (Indexes).l,a0	;	Load collision indexes
 0021007E 49F9 00FF B000             				lea     $FFB000.l,a4
 00210084 4EB9 0000 49A8             				jsr     (nemdec).l
 0021008A                            				
-0021008A 4EF9 0001 3A2E             				jmp     $13A2E
+0021008A 4EF9 0001 3A2E             				jmp     $13A2E			;	Jump back to main routine
 00210090                            ; End of function sub_87EA
-00210090                            
-00210090                            
-00210090                            ; =============== S U B R O U T I N E =======================================
-00210090                            
-00210090                            
-00210090                            sub_8852:				               ; CODE XREF: sub_7B32+104↑p
-00210090 1039 00FF E500             				move.b  $FFE500,d0
-00210096 4EB9 0001 3A98             				jsr     $13A98
-0021009C 1039 00FF E500             				move.b  $FFE500,d0
-002100A2 4EB9 0001 3CC4             				jsr     $13CC4
-002100A8 1039 00FF E500             				move.b  $FFE500,d0
-002100AE                            
-002100AE 43F9 0018 53B0             				lea     ($1853B0).l,a1
-002100B4                            loc_886A:				               ; CODE XREF: sub_EEA6+CC↓p
-002100B4 7000                       				moveq   #0,d0
-002100B6 1039 00FF E500             				move.b  $FFE500,d0
-002100BC D040                       				add.w   d0,d0
-002100BE D040                       				add.w   d0,d0
-002100C0 2071 0000                  				movea.l (a1,d0.w),a0
-002100C4 43F9 00FF 4000             				lea     ($FF4000).l,a1
-002100CA 4EB9 0000 4C3E             				jsr     (stardec).l
-002100D0 41F9 00FF 4000             				lea     ($FF4000).l,a0
-002100D6 43F9 00FF AA00             				lea     ($FFAA00).l,a1
-002100DC 3E3C 00FF                  				move.w  #$FF,d7
-002100E0                            
-002100E0                            loc_889A:				               ; CODE XREF: sub_8852+4A↓j
-002100E0 22D8                       				move.l  (a0)+,(a1)+
-002100E2 51CF FFFC                  				dbf     d7,loc_889A
-002100E6 43F9 0018 8552             				lea     ($188552).l,a1
-002100EC 7000                       				moveq   #0,d0
-002100EE 1039 00FF E500             				move.b  $FFE500,d0
-002100F4 D040                       				add.w   d0,d0
-002100F6 D040                       				add.w   d0,d0
-002100F8 2271 0000                  				movea.l (a1,d0.w),a1
-002100FC 45F9 00FF A600             				lea     $FFA600,a2
-00210102 4EB9 0001 3DB6             				jsr     $13DB6
-00210108 4E75                       				rts
-0021010A                            				
-0021010A                            ;	============================================================================!
-0021010A                            		align		$212000				 ;	BLOCK LOADING						!
+00210090                            ; End of function sub_87EA
+00210090                            				
+00210090                            ;	============================================================================!
+00210090                            		align		$212000				 ;	BLOCK LOADING						!
 00212000                            ;	============================================================================!
 00212000                            		
 00212000 =0011C764                  BlockPointers	=	$11C764
